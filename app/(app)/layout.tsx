@@ -4,6 +4,8 @@ import Sidebar from "../components/sidebar";
 import UserService from "@/services/UserService";
 import { User } from "@/types/User";
 import { useEffect, useState } from "react";
+import Loading from "../components/loading";
+import dayjs from "dayjs"; 
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -26,15 +28,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="p-6">Loading...</div>;
+  if (loading) return <Loading />;
 
-  console.log("USER DARI API:", user);
-  console.log("ROLEID YANG DIKIRIM:", user?.roleId);
+  const today = dayjs().format("dddd, MMMM D, YYYY");
 
   return (
     <div className="flex min-h-screen">
       <Sidebar roleId={user?.roleId ?? 0} />
-      <main className="flex-1 bg-gray-50 p-6">{children}</main>
+      <div className="flex-1 flex flex-col bg-gray-50">
+        <header className="flex items-center justify-between p-6 bg-white shadow">
+          <h1 className="text-xl font-semibold">Hello, {user?.name}</h1>
+          <span className="text-gray-500">{today}</span>
+        </header>
+        <main className="flex-1 p-6">{children}</main>
+      </div>
     </div>
   );
 }
