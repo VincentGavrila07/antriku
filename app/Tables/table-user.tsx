@@ -1,0 +1,99 @@
+"use client";
+
+import React from "react";
+import { Table, Spin, Button } from "antd";
+import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
+import { TableUserProps } from "../props/table-user-props";
+import { User } from "@/types/User";
+import { EyeOutlined, EditOutlined } from "@ant-design/icons";
+
+export default function TableUser({
+  data,
+  total,
+  page,
+  pageSize,
+  isLoading = false,
+  onChange,
+}: TableUserProps) {
+
+  const columns: ColumnsType<User> = [
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+      width: 80,
+      align: "center",
+      render: (text) => <span className="font-medium text-gray-700">{text}</span>,
+    },
+    {
+      title: "Nama",
+      dataIndex: "name",
+      key: "name",
+      render: (text) => <span className="font-medium text-gray-800">{text}</span>,
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      render: (text) => <span className="text-gray-600">{text}</span>,
+    },
+    {
+      title: "Role",
+      dataIndex: "roleName",
+      key: "roleId",
+      render: (text) => (
+        <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-semibold">
+          {text}
+        </span>
+      ),
+    },
+    {
+        title: "Action",
+        key: "action",
+        width: 120,
+        align: "center",
+        render: (_, record) => (
+        <div className="flex justify-center gap-2">
+            <Button className="text-blue-500 hover:text-blue-700">
+                <EyeOutlined />
+            </Button>
+            <Button className="text-green-500 hover:text-green-700">
+                <EditOutlined />
+            </Button>
+        </div>
+        ),
+    },
+  ];
+
+  const handleTableChange = (pagination: TablePaginationConfig) => {
+    if (onChange) {
+      onChange(pagination.current || 1, pagination.pageSize);
+    }
+  };
+
+  return (
+    <Spin spinning={isLoading}>
+      <div className="overflow-x-auto rounded-xl shadow-lg border border-gray-200">
+        <Table
+          columns={columns}
+          dataSource={data}
+          rowKey="id"
+          pagination={{
+            current: page,
+            pageSize: pageSize,
+            total: total,
+            showSizeChanger: true,
+            showTotal: (total) => `Total ${total} pengguna`,
+            className: "mt-2",
+          }}
+          onChange={handleTableChange}
+          bordered={false}
+          rowClassName={() =>
+            "hover:bg-gray-50 transition-colors duration-200"
+          }
+          className="rounded-lg"
+        />
+      </div>
+    </Spin>
+  );
+}

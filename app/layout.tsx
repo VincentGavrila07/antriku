@@ -2,7 +2,8 @@
 import "./globals.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { LanguageProvider } from "./languange-context"; // pastikan path sesuai
+import { LanguageProvider } from "./languange-context"; 
+import { PermissionProvider } from "./context/permission-context";
 
 const queryClient = new QueryClient();
 
@@ -12,7 +13,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <QueryClientProvider client={queryClient}>
           <LanguageProvider>
-            {children}
+            <PermissionProvider>
+              {children}
+            </PermissionProvider>
           </LanguageProvider>
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>

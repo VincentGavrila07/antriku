@@ -7,6 +7,8 @@ export interface Translations {
     appName: string;
     adminDashboard: string;
     userManagement: string;
+    user:string;
+    role:string;
     reports: string;
     staffDashboard: string;
     orders: string;
