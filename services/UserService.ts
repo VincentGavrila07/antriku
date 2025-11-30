@@ -1,5 +1,4 @@
-import { LoginResponse, User } from "@/types/User";
-import { RegisterPayload } from "@/types/User";
+import { LoginResponse, User, RegisterPayload } from "@/types/User";
 import { UserResponsePagination } from "@/types/User";
 import axios from "axios";
 
@@ -63,36 +62,59 @@ const UserService = {
     return res.json();
   },
 
-
-getAllUsers: async (
-  params: {
-    filters?: { name?: string };
-    page?: number;
-    pageSize?: number;
-  }
-): Promise<UserResponsePagination<User[]>> => {
-  // ambil token dari localStorage
-  const token = localStorage.getItem("token");
-  console.log("Token yang digunakan:", token); // debug
-
-  const response = await axios.get<UserResponsePagination<User[]>>(
-    `${BASE_URL}/admin/get-all-user`,
-    {
-      params,
-      headers: token
-        ? { Authorization: `Bearer ${token}` }
-        : undefined,
-      withCredentials: !!token ? false : true,
+  getAllUsers: async (
+    params: {
+      filters?: { name?: string };
+      page?: number;
+      pageSize?: number;
     }
-  );
+  ): Promise<UserResponsePagination<User[]>> => {
+    // ambil token dari localStorage
+    const token = localStorage.getItem("token");
 
-  return response.data;
-},
+    const response = await axios.get<UserResponsePagination<User[]>>(
+      `${BASE_URL}/admin/get-all-user`,
+      {
+        params,
+        headers: token
+          ? { Authorization: `Bearer ${token}` }
+          : undefined,
+        withCredentials: !!token ? false : true,
+      }
+    );
 
+    return response.data;
+  },
 
+  getUserById: async (id: string, token: string) => {
+    const response = await axios.get<User>(`${BASE_URL}/admin/get-user-by-id/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
+    return response.data;
+  },
 
+  deleteUser: async (id: string, token: string) => {
+    const response = await axios.delete(`${BASE_URL}/admin/delete-user/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
+    return response.data;
+  },
+
+  editUser: async (id: string, data: Partial<User>, token: string) => {
+    const response = await axios.put<User>(`${BASE_URL}/admin/edit-user/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  },
 };
 
 export default UserService;

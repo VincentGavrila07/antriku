@@ -1,11 +1,9 @@
 "use client";
-
-import React from "react";
 import { Table, Spin, Button } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import { TableUserProps } from "../props/table-user-props";
 import { User } from "@/types/User";
-import { EyeOutlined, EditOutlined } from "@ant-design/icons";
+import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
 export default function TableUser({
   data,
@@ -14,16 +12,17 @@ export default function TableUser({
   pageSize,
   isLoading = false,
   onChange,
+  onDelete
 }: TableUserProps) {
 
   const columns: ColumnsType<User> = [
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
+      title: "No",
+      dataIndex: "no",
+      key: "no",
       width: 80,
       align: "center",
-      render: (text) => <span className="font-medium text-gray-700">{text}</span>,
+      render: (_, __, index) => <span className="font-medium text-gray-700">{index + 1}</span>,
     },
     {
       title: "Nama",
@@ -48,26 +47,35 @@ export default function TableUser({
       ),
     },
     {
-        title: "Action",
-        key: "action",
-        width: 120,
-        align: "center",
-        render: (_, record) => (
+      title: "Action",
+      key: "action",
+      width: 120,
+      align: "center",
+      render: (_, record) => (
         <div className="flex justify-center gap-2">
-            <Button className="text-blue-500 hover:text-blue-700">
-                <EyeOutlined />
-            </Button>
-            <Button className="text-green-500 hover:text-green-700">
-                <EditOutlined />
-            </Button>
+          <Button >
+            <EyeOutlined />
+          </Button>
+          <Button >
+            <EditOutlined />
+          </Button>
+          <Button
+            onClick={() => {
+              if (onDelete) {
+                onDelete(record.id.toString()); 
+              }
+            }}
+          >
+            <DeleteOutlined />
+          </Button>
         </div>
-        ),
+      ),
     },
   ];
 
   const handleTableChange = (pagination: TablePaginationConfig) => {
     if (onChange) {
-      onChange(pagination.current || 1, pagination.pageSize);
+      onChange(pagination.current || 1, pagination.pageSize || 10);  
     }
   };
 
@@ -82,16 +90,16 @@ export default function TableUser({
             current: page,
             pageSize: pageSize,
             total: total,
-            showSizeChanger: true,
+            showSizeChanger: true,  
+            pageSizeOptions: ['10', '20', '30', '50'],  
             showTotal: (total) => `Total ${total} pengguna`,
             className: "mt-2",
           }}
           onChange={handleTableChange}
           bordered={false}
-          rowClassName={() =>
-            "hover:bg-gray-50 transition-colors duration-200"
-          }
+          rowClassName={() => "hover:bg-gray-50 transition-colors duration-200"}
           className="rounded-lg"
+          locale={{ emptyText: 'No Data' }}  
         />
       </div>
     </Spin>

@@ -5,6 +5,7 @@ import { Form, Input, Button, Checkbox, Typography, Alert } from "antd";
 import { useLogin } from "../hooks/useLogin";
 import { useRouter } from "next/navigation";
 import { GoogleOutlined } from '@ant-design/icons';
+import { usePermission } from "../context/permission-context";
 
 const { Title, Text } = Typography;
 
@@ -12,6 +13,7 @@ const LoginPage = () => {
   const router = useRouter();
   const loginMutation = useLogin();
   const [errorMsg, setErrorMsg] = React.useState("");
+  const { refreshPermissions } = usePermission(); // ambil refreshPermissions dari context
 
   const onFinish = (values: { email: string; password: string; remember: boolean }) => {
     setErrorMsg("");
@@ -19,9 +21,12 @@ const LoginPage = () => {
     loginMutation.mutate(
       { email: values.email, password: values.password },
       {
-        onSuccess: (data) => {
-          localStorage.setItem("token", data.token);
-          router.push("/dashboard");
+        onSuccess: async (data) => {
+          localStorage.setItem("token", data.token); 
+          
+          await refreshPermissions(); 
+
+          router.push("/dashboard"); 
         },
         onError: (err: Error) => {
           setErrorMsg(err.message);
@@ -47,14 +52,10 @@ const LoginPage = () => {
             Log in with Google
           </Button>
 
-
-
           <Text type="secondary" className="my-4 text-center block">OR LOGIN WITH EMAIL</Text>
 
-          {/* ERROR MESSAGE */}
           {errorMsg && <Alert message={errorMsg} type="error" className="mb-4" />}
 
-          {/* FORM */}
           <Form
             name="loginForm"
             layout="vertical"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/app/languange-context";
-import { Spin, Input, notification } from "antd";
+import { Spin, Input, notification, Button } from "antd";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,8 @@ import { User, UserResponsePagination } from "@/types/User";
 import { useDebounce } from "@/app/utils/useDebounce";
 import Breadcrumbs from "@/app/components/breadcrumbs";
 import { usePermission } from "@/app/context/permission-context";
+import { PlusOutlined } from "@ant-design/icons";
+import Swal from "sweetalert2";  
 
 export default function UserManagementPage() {
   const router = useRouter();
@@ -23,26 +25,7 @@ export default function UserManagementPage() {
   const debouncedSearch = useDebounce(searchText, 1500);
 
 
-  // Debug: cek permission
-  useEffect(() => {
-    if (!permissionLoading) {
-      console.log("Permissions user loaded:", permissions);
-    }
-  }, [permissionLoading, permissions]);
-
-
-  useEffect(() => {
-    if (!permissionLoading && !permissions.includes("view-user-management")) {
-      
-      router.replace("/forbidden");
-    }
-  }, [permissions, permissionLoading, router]);
-
-  // Fetch user hanya kalau permission ada
-  const { data: users, isLoading, error } = useQuery<
-    UserResponsePagination<User[]>,
-    Error
-  >({
+  const { data: users, isLoading, error, refetch } = useQuery<UserResponsePagination<User[]>, Error>({
     queryKey: ["users", page, pageSize, debouncedSearch],
     queryFn: () =>
       UserService.getAllUsers({
@@ -53,6 +36,12 @@ export default function UserManagementPage() {
     enabled: permissions.includes("view-user-management"),
   });
 
+  useEffect(() => {
+    if (!permissionLoading && !permissions.includes("view-user-management")) {
+      router.replace("/forbidden");
+    }
+  }, [permissions, permissionLoading, router]);
+
   if (langLoading || permissionLoading || !translations) {
     return (
       <div className="flex justify-center items-center h-40">
@@ -61,26 +50,70 @@ export default function UserManagementPage() {
     );
   }
 
-  if(error){
-    notification.error({ title: "Gagal Memuat Data User", description: "Terjadi kesalahan dalam memuat data user" });
+  if (error) {
+    notification.error({
+      title: "Gagal Memuat Data User",
+      description: "Terjadi kesalahan dalam memuat data user",
+    });
   }
 
   const t = translations.Sidebar;
 
+  const handleDeleteUser = async (userId: string) => {
+    console.log("Attempting to delete user:", userId); 
+    try {
+      await UserService.deleteUser(userId, localStorage.getItem("token") || "");
+
+      refetch();
+
+      notification.success({ title: "User berhasil dihapus" });
+    } catch (error) {
+      console.error("Delete failed:", error);  
+      notification.error({
+        title: "Gagal Menghapus User",
+        description: "Terjadi kesalahan saat menghapus user",
+      });
+    }
+  };
+
+  const handleDeleteConfirmation = (userId: string) => {
+    Swal.fire({
+      title: "Konfirmasi Hapus User",
+      text: "Apakah Anda yakin ingin menghapus user ini?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Hapus",
+      cancelButtonText: "Batal",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleDeleteUser(userId);
+      }
+    });
+  };
+
   return (
-    <div className="p-6">
+    <div>
       <Breadcrumbs
         items={[{ label: "User", href: "/admin/user-management/user" }]}
       />
-
-      <h1 className="text-2xl font-bold mb-4">{t.userManagement}</h1>
-
-      <Input
-        placeholder="Search by name..."
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        className="mb-4"
-      />
+      
+      <div className="flex justify-end items-center mt-4 mb-6 gap-5">
+        <Input
+          placeholder="Search by name..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          className="w-80 max-w-xs mr-4" 
+        />
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => {
+            console.log("Tombol Add User diklik!");
+          }}
+        >
+          Add User
+        </Button>
+      </div>
 
       <TableUser
         data={users?.data ?? []}
@@ -92,6 +125,7 @@ export default function UserManagementPage() {
           setPage(newPage);
           if (newPageSize) setPageSize(newPageSize);
         }}
+        onDelete={handleDeleteConfirmation} 
       />
     </div>
   );
