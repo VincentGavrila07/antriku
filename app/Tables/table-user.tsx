@@ -4,6 +4,7 @@ import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import { TableUserProps } from "../props/table-user-props";
 import { User } from "@/types/User";
 import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation"
 
 export default function TableUser({
   data,
@@ -14,6 +15,8 @@ export default function TableUser({
   onChange,
   onDelete
 }: TableUserProps) {
+
+  const router = useRouter();
 
   const columns: ColumnsType<User> = [
     {
@@ -53,7 +56,11 @@ export default function TableUser({
       align: "center",
       render: (_, record) => (
         <div className="flex justify-center gap-2">
-          <Button >
+          <Button
+            onClick={() => {
+              router.push(`/user-management/user/${record.id}`);
+            }}
+          >
             <EyeOutlined />
           </Button>
           <Button >

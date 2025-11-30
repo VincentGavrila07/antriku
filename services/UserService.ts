@@ -87,7 +87,7 @@ const UserService = {
   },
 
   getUserById: async (id: string, token: string) => {
-    const response = await axios.get<User>(`${BASE_URL}/admin/get-user-by-id/${id}`, {
+    const response = await axios.get<User>(`${BASE_URL}/admin/user-detail/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
