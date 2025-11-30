@@ -96,7 +96,9 @@ export default function UserManagementPage() {
       <Breadcrumbs
         items={[{ label: "User", href: "/admin/user-management/user" }]}
       />
-      
+
+      <h2 className="text-3xl font-semibold mb-4 mt-5">List User</h2>
+
       <div className="flex justify-end items-center mt-4 mb-6 gap-5">
         <Input
           placeholder="Search by name..."
@@ -108,7 +110,7 @@ export default function UserManagementPage() {
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => {
-            console.log("Tombol Add User diklik!");
+            router.push("/user-management/user/add");
           }}
         >
           Add User

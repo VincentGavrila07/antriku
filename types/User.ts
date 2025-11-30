@@ -46,3 +46,9 @@ export interface UserResponsePagination<T> {
     to: number;
     total: number;
 }
+
+export interface AddUserFormValues {
+  name: string;
+  email: string;
+  roleId: number;
+}

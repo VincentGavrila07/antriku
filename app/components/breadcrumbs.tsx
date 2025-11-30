@@ -2,11 +2,11 @@
 
 import React from "react";
 import Link from "next/link";
-import { HomeIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { HomeIcon, ChevronRightIcon, ArrowLeftIcon } from "@heroicons/react/24/solid"; // Importing ArrowLeftIcon
 
 export interface BreadcrumbItem {
   label: string;
-  href?: string; 
+  href?: string;
 }
 
 interface BreadcrumbsProps {
@@ -14,10 +14,22 @@ interface BreadcrumbsProps {
 }
 
 export default function Breadcrumbs({ items }: BreadcrumbsProps) {
+  const handleBackClick = () => {
+    window.history.back(); 
+  };
+
   if (!items || items.length === 0) return null;
 
   return (
-    <nav className="flex items-center text-sm text-gray-500" aria-label="Breadcrumb">
+    <nav className="flex items-center text-sm text-gray-500 gap-5 mb-5" aria-label="Breadcrumb">
+      <button
+        onClick={handleBackClick}
+        className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-500 mr-3"
+        aria-label="Back"
+      >
+        <ArrowLeftIcon className="w-5 h-5" />
+      </button>
+
       <Link href="/dashboard" className="flex items-center hover:text-gray-700">
         <HomeIcon className="w-4 h-4 mr-1" />
         Home

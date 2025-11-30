@@ -24,6 +24,6 @@ export default function DashboardPage() {
 
   // Render dashboard sesuai role
   if (user.roleId === 1) return <AdminDashboard user={user} />;
-  if (user.roleId === 2) return <StaffDashboard user={user} />;
+  if (user.roleId === 3) return <StaffDashboard user={user} />;
   return <CustomerDashboard user={user} />;
 }

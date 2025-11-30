@@ -115,6 +115,20 @@ const UserService = {
 
     return response.data;
   },
+
+  createUser: async (userData: {
+    name: string;
+    email: string;
+    roleId: number;
+  }, token: string) => {
+    const response = await axios.post(`${BASE_URL}/admin/store-user`, userData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  },
 };
 
 export default UserService;

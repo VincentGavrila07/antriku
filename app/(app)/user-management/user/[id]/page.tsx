@@ -84,12 +84,6 @@ export default function UserDetailPage() {
         <Form.Item label="Role" name="roleName">
           <Input readOnly />
         </Form.Item>        
-        <Button
-          type="default"
-          onClick={() => router.back()}
-        >
-          Kembali
-        </Button>
       </Form>
     </div>
   );
