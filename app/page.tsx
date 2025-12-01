@@ -18,7 +18,7 @@ export default function Navbar() {
           <button 
             onClick={() => changeLanguage("id")} 
             className={`px-4 py-2 rounded-lg ${lang === "id" ? "bg-blue-500" : "bg-blue-700"}`}>
-            Bahasa
+            Bahasa Tes
           </button>
         </div>
       </div>
