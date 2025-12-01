@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Form, Input, Button, Checkbox, Typography, Alert } from "antd";
+import { Form, Input, Button, Checkbox, Typography } from "antd";
 import { useLogin } from "../hooks/useLogin";
 import { useRouter } from "next/navigation";
 import { GoogleOutlined } from '@ant-design/icons';
@@ -54,7 +54,7 @@ const LoginPage = () => {
 
           <Text type="secondary" className="my-4 text-center block">OR LOGIN WITH EMAIL</Text>
 
-          {errorMsg && <Alert message={errorMsg} type="error" className="mb-4" />}
+          {errorMsg}
 
           <Form
             name="loginForm"

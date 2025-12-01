@@ -82,7 +82,7 @@ export default function AddUserPage() {
 
         <Breadcrumbs
           items={[
-            { label: "User", href: "/admin/user-management/user" },
+            { label: "User", href: "/user-management/user" },
             { label: "Tambah User", href: "/admin/user-management/user/add" },
           ]}
         />
