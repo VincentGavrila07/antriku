@@ -26,3 +26,7 @@ export interface RoleResponsePagination<T> {
     to: number;
     total: number;
 }
+
+export interface AddRoleFormValues {
+  name: string;
+}

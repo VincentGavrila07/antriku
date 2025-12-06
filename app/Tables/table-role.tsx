@@ -43,14 +43,7 @@ export default function TableRole({
         <div className="flex justify-center gap-2">
           <Button
             onClick={() => {
-              router.push(`/user-management/user/${record.id}`);
-            }}
-          >
-            <EyeOutlined />
-          </Button>
-          <Button
-            onClick={() => {
-              router.push(`/user-management/user/edit/${record.id}`);
+              router.push(`/user-management/role/edit/${record.id}`);
             }}
           >
             <EditOutlined />

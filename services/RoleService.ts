@@ -47,6 +47,48 @@ const RoleService = {
 
         return response.data;
     },
+
+    createRole: async (roleData: {
+        name: string;
+      }, token: string) => {
+        const response = await axios.post(`${BASE_URL}/admin/store-role`, roleData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+    
+        return response.data;
+    },
+
+    updateRole: async (
+        id: string,
+        roleData: {
+          name: string;
+        },
+        token: string
+      ) => {
+        const response = await axios.put(
+          `${BASE_URL}/admin/update-role/${id}`,
+          roleData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+    
+        return response.data;
+    },
+
+    getRoleById: async (id: string, token: string) => {
+        const response = await axios.get<Role>(`${BASE_URL}/admin/role-detail/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+    
+        return response.data;
+    },
 };
 
 export default RoleService;
