@@ -67,7 +67,8 @@ export default function Sidebar({ roleId }: SidebarProps) {
                         ? t.adminDashboard
                         : roleId === 2
                         ? t.staffDashboard
-                        : t.myDashboard}
+                        : t.myDashboard
+                    }
                 </Link>
             ),
         },

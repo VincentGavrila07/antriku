@@ -96,6 +96,16 @@ const UserService = {
     return response.data;
   },
 
+  getUserByIdProfile: async (id: string, token: string) => {
+    const response = await axios.get<User>(`${BASE_URL}/admin/user-detail/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  },
+
   deleteUser: async (id: string, token: string) => {
     const response = await axios.delete(`${BASE_URL}/admin/delete-user/${id}`, {
       headers: {
@@ -129,6 +139,29 @@ const UserService = {
 
     return response.data;
   },
+
+  updateUser: async (
+    id: string,
+    userData: {
+      name: string;
+      roleId: number;
+    },
+    token: string
+  ) => {
+    const response = await axios.put(
+      `${BASE_URL}/admin/update-user/${id}`,
+      userData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  },
+
+
 };
 
 export default UserService;

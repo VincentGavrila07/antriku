@@ -63,7 +63,11 @@ export default function TableUser({
           >
             <EyeOutlined />
           </Button>
-          <Button >
+          <Button
+            onClick={() => {
+              router.push(`/user-management/user/edit/${record.id}`);
+            }}
+          >
             <EditOutlined />
           </Button>
           <Button
