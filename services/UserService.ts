@@ -96,16 +96,6 @@ const UserService = {
     return response.data;
   },
 
-  getUserByIdProfile: async (id: string, token: string) => {
-    const response = await axios.get<User>(`${BASE_URL}/admin/user-detail/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    return response.data;
-  },
-
   deleteUser: async (id: string, token: string) => {
     const response = await axios.delete(`${BASE_URL}/admin/delete-user/${id}`, {
       headers: {
@@ -161,6 +151,36 @@ const UserService = {
     return response.data;
   },
 
+  updateProfile: async (
+    data: {
+      name: string;
+      email: string;
+      password?: string;
+      currentPassword?: string;
+    },
+    token: string
+  ) => {
+    // Endpoint beda: /profile/update
+    const response = await axios.put(`${BASE_URL}/profile/update`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
+  getUserByIdProfile: async (id: string, token: string) => {
+    const response = await axios.get<User>(
+      `${BASE_URL}/admin/user-detail/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  },
 
 };
 
