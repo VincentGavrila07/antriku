@@ -26,8 +26,6 @@ export default function Sidebar({ roleId }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const { translations, loading } = useLanguage();
   const [openKeys, setOpenKeys] = useState<string[]>([]);
-  // Ambil userId dari localStorage
-  const id = typeof window !== "undefined" ? localStorage.getItem("id") : null;
 
   if (loading || !translations) {
     return (
@@ -77,8 +75,7 @@ export default function Sidebar({ roleId }: SidebarProps) {
     {
       key: "profile",
       icon: <ProfileOutlined />,
-      // Pastikan userId ada sebelum render Link.
-      label: <Link href={`/profile/${id}`}>Profile</Link>,
+      label: <Link href={'/profile'}>Profile</Link>,
     },
 
     roleId === 1 && {

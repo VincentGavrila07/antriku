@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Form, Input, Button, Checkbox, Typography } from "antd";
+import { Form, Input, Button, Checkbox, Typography, notification } from "antd";
 import { useLogin } from "../hooks/useLogin";
 import { useRouter } from "next/navigation";
 import { GoogleOutlined } from "@ant-design/icons";
@@ -34,6 +34,10 @@ const LoginPage = () => {
         },
         onError: (err: Error) => {
           setErrorMsg(err.message);
+          notification.error({
+            title: "Login Failed",
+            description: err.message,
+          });
         },
       }
     );

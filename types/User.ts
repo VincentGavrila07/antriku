@@ -52,3 +52,9 @@ export interface AddUserFormValues {
   email: string;
   roleId: number;
 }
+
+export interface UpdateUserFormValues {
+  name: string;
+  newPassword?: string;
+  currentPassword?: string;
+}

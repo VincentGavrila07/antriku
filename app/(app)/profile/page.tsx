@@ -8,19 +8,14 @@ import UserService from "@/services/UserService";
 import { SaveOutlined } from "@ant-design/icons";
 import { User } from "@/types/User";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-
-interface UpdateUserPayload {
-  name: string;
-  email: string;
-  password?: string;
-  currentPassword?: string;
-}
+import { UpdateUserFormValues } from "@/types/User";
+import { useRouter } from "next/navigation";
 
 export default function EditProfilePage() {
   const [form] = Form.useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { translations, loading: langLoading } = useLanguage();
-
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const token =
@@ -41,43 +36,40 @@ export default function EditProfilePage() {
     }
   }, [loggedInUser, form]);
 
-  const handleFormSubmit = async (values: {
-    name: string;
-    email: string;
-    newPassword?: string;
-    currentPassword?: string;
-  }) => {
-    if (!loggedInUser?.id) return;
 
+  const handleFormSubmit = async (values: UpdateUserFormValues) => {
     setIsSubmitting(true);
+
     try {
-      const payload: UpdateUserPayload = {
+      const token = localStorage.getItem("token") || "";
+
+      const payload: {
+        name: string;
+        newPassword?: string;
+        currentPassword?: string;
+      } = {
         name: values.name,
-        email: values.email,
       };
 
-      if (values.newPassword) payload.password = values.newPassword;
-      if (values.currentPassword)
+      if (values.newPassword) {
+        payload.newPassword = values.newPassword;
         payload.currentPassword = values.currentPassword;
-
-      const response = await UserService.updateProfile(payload, token);
-
-      notification.success({
-        title: "Profile berhasil diperbarui",
-      });
-
-      await queryClient.invalidateQueries({ queryKey: ["profile-me"] });
-
-      if (response?.user) {
-        localStorage.setItem("user", JSON.stringify(response.user));
       }
 
-      form.setFieldValue("currentPassword", "");
-      form.setFieldValue("newPassword", "");
-    } catch (error: any) {
+      await UserService.updateProfile(payload, token);
+
+      notification.success({
+        title: "Profil berhasil diperbarui",
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["profile-me"] });
+
+      router.push('/dashboard');
+
+    } catch (error: unknown) {
       notification.error({
-        title: "Gagal memperbarui profile",
-        description: error?.response?.data?.message || "Terjadi kesalahan.",
+        title: "Gagal memperbarui profil",
+        description: "Terjadi kesalahan saat memperbarui profil.",
       });
     } finally {
       setIsSubmitting(false);
@@ -114,16 +106,6 @@ export default function EditProfilePage() {
           <Input placeholder="Masukkan nama user" />
         </Form.Item>
 
-        <Form.Item
-          label="Email"
-          name="email"
-          rules={[
-            { required: true, message: "Email harus diisi" },
-            { type: "email", message: "Format email tidak valid" },
-          ]}
-        >
-          <Input placeholder="nama@email.com" />
-        </Form.Item>
 
         <Divider plain>Ganti Password (Opsional)</Divider>
 
