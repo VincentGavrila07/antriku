@@ -55,91 +55,148 @@ const RegisterPage = () => {
     );
   };
 
+  const logoPath = "/assets/LogoAntriku3NoBG.png";
+  const bgPath = "/assets/Antri.jpg";
+
   return (
-    <div className="min-h-screen bg-[#8CA6FF] flex items-center justify-center p-6">
-      <div className="bg-white w-full max-w-5xl rounded-3xl shadow-xl grid grid-cols-1 md:grid-cols-2 overflow-hidden">
-        
-        {/* LEFT SIDE */}
-        <div className="p-10 flex flex-col justify-center">
-          <Title level={2} className="mb-6">Create Your Account</Title>
+    // Background Halaman: Abu-abu muda (Konsisten dengan Login)
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      {/* Container Utama: Grid 2 Kolom (Kiri Gambar, Kanan Form) */}
+      <div className="bg-white w-full max-w-5xl rounded-3xl shadow-2xl grid grid-cols-1 md:grid-cols-2 overflow-hidden min-h-[650px]">
+        {/* ================= SISI KIRI: GAMBAR BACKGROUND ================= */}
+        <div className="relative hidden md:flex flex-col justify-end p-12 text-white">
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url('${bgPath}')` }}
+          />
 
-          {/* Google Sign Up */}
-          <Button
-            type="default"
-            icon={<GoogleOutlined />}
-            className="w-full mb-5 flex items-center justify-center gap-2"
-          >
-            Sign up with Google
-          </Button>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-          <Text type="secondary" className="block text-center mb-5">
-            OR SIGN UP WITH EMAIL
-          </Text>
+          <div className="relative z-10 text-center">
+            <h2 className="text-3xl font-bold mb-2 text-white drop-shadow-md">
+              Join Antriku System
+            </h2>
+            <p className="text-gray-200 text-lg opacity-90 drop-shadow-sm">
+              Daftarkan akun Anda dan mulai kelola antrian dengan lebih efisien
+              hari ini.
+            </p>
+          </div>
+        </div>
+
+        {/* ================= SISI KANAN: FORM REGISTER (PUTIH BERSIH) ================= */}
+        <div className="p-8 md:p-12 flex flex-col justify-center bg-white">
+          {/* Header Section: Logo & Judul */}
+          <div className="mb-8 flex flex-col items-center text-center">
+            {/* Logo Persegi Panjang */}
+            <div className="border-gray-100">
+              <img
+                src={logoPath}
+                alt="Antriku Logo"
+                className="h-16 w-auto object-contain rounded-lg"
+              />
+            </div>
+
+            <Title
+              level={2}
+              style={{ marginBottom: 0, fontWeight: 700, color: "#1f2937" }}
+            >
+              Login
+            </Title>
+          </div>
 
           {/* FORM */}
-          <Form form={form} layout="vertical" onFinish={handleSubmit}>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleSubmit}
+            size="large"
+            requiredMark={false}
+          >
             <Form.Item
-              label="Full Name"
+              label={
+                <span className="font-semibold text-gray-700">Full Name</span>
+              }
               name="name"
               rules={[{ required: true, message: "Nama wajib diisi" }]}
             >
-              <Input placeholder="Your Full Name" />
+              <Input
+                placeholder="Your Full Name"
+                className="rounded-lg py-2.5 bg-gray-50 border-gray-200 hover:bg-white focus:bg-white transition-all"
+              />
             </Form.Item>
 
             <Form.Item
-              label="Email Address"
+              label={
+                <span className="font-semibold text-gray-700">
+                  Email Address
+                </span>
+              }
               name="email"
               rules={[
                 { required: true, message: "Email wajib diisi" },
                 { type: "email", message: "Email tidak valid" },
               ]}
             >
-              <Input placeholder="Email Address" />
+              <Input
+                placeholder="nama@email.com"
+                className="rounded-lg py-2.5 bg-gray-50 border-gray-200 hover:bg-white focus:bg-white transition-all"
+              />
             </Form.Item>
 
             <Form.Item
-              label="Password"
+              label={
+                <span className="font-semibold text-gray-700">Password</span>
+              }
               name="password"
               rules={[{ required: true, message: "Password wajib diisi" }]}
             >
-              <Input.Password placeholder="Create Password" />
+              <Input.Password
+                placeholder="Create Password"
+                className="rounded-lg py-2.5 bg-gray-50 border-gray-200 hover:bg-white focus:bg-white transition-all"
+              />
             </Form.Item>
 
             <Form.Item
-              label="Confirm Password"
+              label={
+                <span className="font-semibold text-gray-700">
+                  Confirm Password
+                </span>
+              }
               name="confirmPassword"
               rules={[{ required: true, message: "Konfirmasi password wajib" }]}
             >
-              <Input.Password placeholder="Confirm Password" />
+              <Input.Password
+                placeholder="Confirm Password"
+                className="rounded-lg py-2.5 bg-gray-50 border-gray-200 hover:bg-white focus:bg-white transition-all"
+              />
             </Form.Item>
 
-            <Form.Item>
+            <Form.Item className="mt-8">
               <Button
                 type="primary"
                 htmlType="submit"
-                className="w-full bg-green-600 hover:bg-green-700"
+                block
+                size="large"
                 loading={registerMutation.isPending}
+                className="font-bold text-lg h-12 rounded-lg bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200 border-none transition-all"
               >
                 Sign Up
               </Button>
             </Form.Item>
           </Form>
 
-          <Text className="mt-6 block text-center text-gray-600">
-            Already have an account?{" "}
-            <a href="/login" className="text-blue-600 font-semibold hover:underline">
-              Log in
-            </a>
-          </Text>
-        </div>
-
-        {/* RIGHT IMAGE */}
-        <div className="relative w-full h-full">
-          <img
-            src="/assets/register.jpg"
-            alt="Register Background"
-            className="w-full h-full object-cover"
-          />
+          {/* Footer Link ke Login */}
+          <div className="text-center mt-4">
+            <Text className="text-gray-500">
+              Already have an account?{" "}
+              <a
+                href="/login"
+                className="text-blue-600 font-bold hover:underline"
+              >
+                Log in
+              </a>
+            </Text>
+          </div>
         </div>
       </div>
     </div>

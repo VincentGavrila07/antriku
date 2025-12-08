@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Form, Input, Button, Checkbox, Typography, notification } from "antd";
+import { Form, Input, Button, Checkbox, Typography, notification, Alert, Divider } from "antd";
 import { useLogin } from "../hooks/useLogin";
 import { useRouter } from "next/navigation";
 import { GoogleOutlined } from "@ant-design/icons";
@@ -43,104 +43,146 @@ const LoginPage = () => {
     );
   };
 
+  const logoPath = "/assets/LogoAntriku3NoBG.png";
+  const bgPath = "/assets/Antri.jpg";
+
   return (
-    <div className="min-h-screen bg-[#8CA6FF] flex items-center justify-center p-6">
-      <div className="bg-white w-full max-w-5xl rounded-3xl shadow-xl grid grid-cols-1 md:grid-cols-2 overflow-hidden">
-        {/* LEFT SIDE - FORM */}
-        <div className="p-10 flex flex-col justify-center">
-          <Title level={2} className="mb-6">
-            Welcome Back
-          </Title>
+    // Background Halaman: Abu-abu muda agar Kartu Login terlihat "pop"
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      {/* Container Utama: Grid 2 Kolom (Kiri Gambar, Kanan Form) */}
+      <div className="bg-white w-full max-w-5xl rounded-3xl shadow-2xl grid grid-cols-1 md:grid-cols-2 overflow-hidden min-h-[650px]">
+        {/* ================= SISI KIRI: GAMBAR BACKGROUND ================= */}
+        <div className="relative hidden md:flex flex-col justify-end p-12 text-white">
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url('${bgPath}')` }}
+          />
 
-          {/* Google Login */}
-          <Button
-            type="default"
-            className="w-full mb-5 flex items-center justify-center gap-2"
-            icon={<GoogleOutlined />}
-          >
-            Log in with Google
-          </Button>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-          <Text type="secondary" className="my-4 text-center block">
-            OR LOGIN WITH EMAIL
-          </Text>
+          <div className="relative z-10 text-center">
+            <h2 className="text-3xl font-bold mb-2 text-white drop-shadow-md">
+              Join Antriku System
+            </h2>
+            <p className="text-gray-200 text-lg opacity-90 drop-shadow-sm">
+              Daftarkan akun Anda dan mulai kelola antrian dengan lebih efisien
+              hari ini.
+            </p>
+          </div>
+        </div>
 
-          {errorMsg}
+        {/* ================= SISI KANAN: FORM LOGIN (PUTIH BERSIH) ================= */}
+        <div className="p-8 md:p-12 flex flex-col justify-center bg-white">
+          {/* Header Section: Logo & Judul */}
+          <div className="mb-8 flex flex-col items-center text-center">
+            {/* Logo Persegi Panjang */}
+            <div className="border-gray-100">
+              <img
+                src={logoPath}
+                alt="Antriku Logo"
+                className="h-16 w-auto object-contain rounded-lg"
+              />
+            </div>
+
+            <Title
+              level={2}
+              style={{ marginBottom: 0, fontWeight: 700, color: "#1f2937" }}
+            >
+              Login
+            </Title>
+          </div>
+
+          {/* Error Alert */}
+          {errorMsg && (
+            <Alert
+              message="Login Gagal"
+              description={errorMsg}
+              type="error"
+              showIcon
+              className="mb-6 rounded-lg"
+            />
+          )}
 
           <Form
             name="loginForm"
             layout="vertical"
             onFinish={onFinish}
             requiredMark={false}
+            size="large"
           >
             <Form.Item
-              label="Email Address"
+              label={
+                <span className="font-semibold text-gray-700">
+                  Email Address
+                </span>
+              }
               name="email"
               rules={[
                 { required: true, message: "Email wajib diisi" },
                 { type: "email", message: "Email tidak valid" },
               ]}
             >
-              <Input placeholder="Email Address" />
+              {/* Input Standar (Clean White) */}
+              <Input
+                placeholder="nama@email.com"
+                className="rounded-lg py-2.5 bg-gray-50 border-gray-200 hover:bg-white focus:bg-white transition-all"
+              />
             </Form.Item>
 
             <Form.Item
-              label="Password"
+              label={
+                <span className="font-semibold text-gray-700">Password</span>
+              }
               name="password"
               rules={[
                 { required: true, message: "Password wajib diisi" },
                 { min: 6, message: "Password minimal 6 karakter" },
               ]}
             >
-              <Input.Password placeholder="Password" />
+              <Input.Password
+                placeholder="Masukkan password"
+                className="rounded-lg py-2.5 bg-gray-50 border-gray-200 hover:bg-white focus:bg-white transition-all"
+              />
             </Form.Item>
 
-            <Form.Item name="remember" valuePropName="checked">
-              <Checkbox>Keep me logged in</Checkbox>
-            </Form.Item>
+            <div className="flex justify-between items-center mb-8">
+              <Form.Item name="remember" valuePropName="checked" noStyle>
+                <Checkbox className="text-gray-600">Remember me</Checkbox>
+              </Form.Item>
+              <a
+                className="text-blue-600 hover:text-blue-800 font-semibold text-sm"
+                href="/forgot-password"
+              >
+                Forgot Password?
+              </a>
+            </div>
 
             <Form.Item>
               <Button
                 type="primary"
                 htmlType="submit"
                 block
+                size="large"
                 loading={loginMutation.isPending}
+                className="font-bold text-lg h-12 rounded-lg bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200 border-none transition-all"
               >
-                Log In
+                Sign In
               </Button>
             </Form.Item>
           </Form>
 
-          <Text className="text-gray-600">
-            Don’t have an account?{" "}
-            <a
-              className="text-blue-600 font-semibold hover:underline"
-              href="/register"
-            >
-              Sign up
-            </a>
-          </Text>
-        </div>
-
-        {/* RIGHT SIDE - IMAGE */}
-        <div className="bg-linear-to-br from-blue-50 to-purple-50 flex flex-col items-center justify-center p-10 text-center">
-          <img
-            src="/assets/register.jpg"
-            alt="Illustration"
-            className="w-72 mb-6"
-          />
-
-          <Title level={4} className="mb-2">
-            Sleeknote Academy
-          </Title>
-          <Text type="secondary" className="text-sm mb-6">
-            We’ve got tools and tips to keep your business growing while you
-            rest.
-          </Text>
-
-          <Button className="border px-6 py-2 rounded-md hover:bg-gray-100">
-            START ACADEMY
-          </Button>
+          {/* Footer Register */}
+          <div className="text-center mt-6">
+            <Text className="text-gray-500">
+              Belum punya akun?{" "}
+              <a
+                className="text-blue-600 font-bold hover:underline"
+                href="/register"
+              >
+                Daftar Sekarang
+              </a>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
