@@ -9,6 +9,7 @@ export interface Translations {
     userManagement: string;
     user:string;
     role:string;
+    permission:string;
     reports: string;
     staffDashboard: string;
     orders: string;

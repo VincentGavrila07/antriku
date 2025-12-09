@@ -91,6 +91,10 @@ export default function Sidebar({ roleId }: SidebarProps) {
           key: "role",
           label: <Link href="/user-management/role">{t.role}</Link>,
         },
+        {
+          key: "permission",
+          label: <Link href="/user-management/permission">{t.permission}</Link>,
+        },
       ],
     },
     roleId === 1 && {
