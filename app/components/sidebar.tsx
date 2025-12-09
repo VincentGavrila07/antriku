@@ -98,6 +98,11 @@ export default function Sidebar({ roleId }: SidebarProps) {
       ],
     },
     roleId === 1 && {
+      key: "service",
+      icon: <FileTextOutlined />,
+      label: <Link href="/layanan">{t.service}</Link>,
+    },
+    roleId === 1 && {
       key: "reports",
       icon: <FileTextOutlined />,
       label: <Link href="/reports">{t.reports}</Link>,

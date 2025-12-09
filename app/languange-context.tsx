@@ -11,6 +11,7 @@ export interface Translations {
     role:string;
     permission:string;
     reports: string;
+    service: string;
     staffDashboard: string;
     orders: string;
     myDashboard: string;
