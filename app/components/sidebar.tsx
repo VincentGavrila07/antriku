@@ -65,7 +65,7 @@ export default function Sidebar({ roleId }: SidebarProps) {
         <Link href="/dashboard">
           {roleId === 1
             ? t.adminDashboard
-            : roleId === 2
+            : roleId === 3
             ? t.staffDashboard
             : t.myDashboard}
         </Link>

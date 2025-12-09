@@ -38,7 +38,7 @@ const RegisterPage = () => {
     }
 
     registerMutation.mutate(
-      { name, email, password, roleId: 3 },
+      { name, email, password, roleId: 2 },
       {
         onSuccess: (data) => {
           localStorage.setItem("token", data.token);
