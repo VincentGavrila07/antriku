@@ -25,6 +25,7 @@ import {
   ExperimentOutlined,
   HeartOutlined,
   InfoCircleOutlined,
+  WarningOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import UserService from "@/services/UserService";
@@ -118,20 +119,12 @@ const mockHistory = [
     date: "05 Nov",
     type: "success",
   },
-  {
-    id: 6,
-    title: "Poli Mata",
-    desc: "Selesai",
-    date: "01 Nov",
-    type: "success",
-  },
 ];
 
 export default function CustomerDashboard() {
   const { translations, loading: langLoading } = useLanguage();
   const router = useRouter();
 
-  // 1. DATA ASLI (Hanya untuk Profile)
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") ?? "" : "";
   const { data: loggedInUser, isLoading: userLoading } = useQuery<User>({
@@ -148,23 +141,29 @@ export default function CustomerDashboard() {
     );
   }
 
-  // --- CONFIG TINGGI CARD (Agar semua simetris & pasif) ---
-  const CARD_HEIGHT_CLASS = "h-[360px]";
+  // --- CONFIG TINGGI CARD RESPONSIVE ---
+  // Mobile: h-auto (fleksibel mengikuti konten)
+  // Desktop (lg): h-[360px] (simetris agar rapi)
+  const CARD_HEIGHT_CLASS =
+    "h-auto lg:h-[360px] shadow-sm hover:shadow-md transition-shadow duration-300 rounded-2xl border-none overflow-hidden flex flex-col";
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 md:p-10 font-sans">
-      <div className="max-w-[1400px] mx-auto space-y-8">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6 lg:p-10 font-sans pb-20">
+      <div className="max-w-[1400px] mx-auto space-y-6">
         {/* Header Title */}
-        <div className="flex justify-between items-end">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-2">
           <div>
-            <Title level={3} className="text-gray-800 m-0 font-bold">
+            <Title
+              level={3}
+              className="text-gray-800 m-0 font-bold text-xl md:text-2xl"
+            >
               Dashboard Pasien
             </Title>
-            <Text className="text-gray-500 text-base">
+            <Text className="text-gray-500 text-sm md:text-base">
               Selamat datang kembali, {loggedInUser?.name || "Pasien"}
             </Text>
           </div>
-          <div className="text-right hidden md:block">
+          <div className="hidden md:block text-right">
             <Text type="secondary" className="text-xs">
               Terakhir diupdate: Baru saja
             </Text>
@@ -172,7 +171,7 @@ export default function CustomerDashboard() {
         </div>
 
         {/* --- TOP ROW --- */}
-        <Row gutter={[32, 32]}>
+        <Row gutter={[16, 16]}>
           {/* 1. ACTIVE QUEUE */}
           <Col xs={24} lg={16}>
             <div className="flex justify-between items-center mb-3">
@@ -184,26 +183,31 @@ export default function CustomerDashboard() {
               </Text>
             </div>
             <Card
-              className={`shadow-sm hover:shadow-md transition-shadow duration-300 rounded-2xl border-none overflow-hidden ${CARD_HEIGHT_CLASS}`}
-              bodyStyle={{ padding: 0, height: "100%" }}
+              className={CARD_HEIGHT_CLASS}
+              bodyStyle={{
+                padding: 0,
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+              }}
             >
               {mockActiveQueue.hasQueue ? (
                 <div className="flex flex-col md:flex-row h-full">
                   {/* Left Side: Number */}
-                  <div className="bg-blue-600 p-8 text-white flex flex-col justify-between md:w-5/12 relative overflow-hidden group">
-                    <div className="absolute -top-6 -right-6 opacity-10 text-[100px] group-hover:rotate-12 transition-transform duration-700">
+                  <div className="bg-blue-600 p-6 md:p-8 text-white flex flex-col justify-between md:w-5/12 relative overflow-hidden group min-h-[200px]">
+                    <div className="absolute -top-6 -right-6 opacity-10 text-[80px] md:text-[100px] group-hover:rotate-12 transition-transform duration-700">
                       <HistoryOutlined />
                     </div>
                     <div className="relative z-10">
-                      <Text className="text-blue-100 text-sm font-medium opacity-90">
+                      <Text className="text-blue-100 text-xs md:text-sm font-medium opacity-90">
                         Nomor Antrian
                       </Text>
-                      <h1 className="text-7xl font-black m-0 text-white tracking-tighter mt-1">
+                      <h1 className="text-6xl md:text-7xl font-black m-0 text-white tracking-tighter mt-1">
                         {mockActiveQueue.queueNumber}
                       </h1>
                     </div>
-                    <div className="mt-auto relative z-10">
-                      <Tag className="bg-white/20 text-white border-none px-4 py-1.5 text-xs font-bold rounded-full backdrop-blur-sm uppercase">
+                    <div className="mt-auto relative z-10 pt-4">
+                      <Tag className="bg-white/20 text-white border-none px-3 py-1 text-xs font-bold rounded-full backdrop-blur-sm uppercase">
                         {mockActiveQueue.status === "waiting"
                           ? "MENUNGGU DIPANGGIL"
                           : "SEDANG DIPANGGIL"}
@@ -212,7 +216,7 @@ export default function CustomerDashboard() {
                   </div>
 
                   {/* Right Side: Details */}
-                  <div className="p-8 md:w-7/12 flex flex-col justify-center bg-white relative">
+                  <div className="p-6 md:p-8 flex-1 flex flex-col justify-center bg-white relative">
                     <div className="mb-6">
                       <Text
                         type="secondary"
@@ -220,18 +224,21 @@ export default function CustomerDashboard() {
                       >
                         Layanan
                       </Text>
-                      <Title level={2} className="m-0 text-gray-800 font-bold">
+                      <Title
+                        level={2}
+                        className="m-0 text-gray-800 font-bold text-xl md:text-3xl"
+                      >
                         {mockActiveQueue.serviceName}
                       </Title>
                     </div>
-                    <div className="grid grid-cols-2 gap-8 border-t border-gray-100 pt-6">
+                    <div className="grid grid-cols-2 gap-4 md:gap-8 border-t border-gray-100 pt-6">
                       <div>
                         <span className="text-[10px] font-bold text-gray-400 uppercase block mb-1">
                           Estimasi
                         </span>
                         <div className="flex items-center gap-2">
                           <ClockCircleOutlined className="text-blue-500 text-lg" />
-                          <span className="text-xl font-bold text-gray-700">
+                          <span className="text-lg md:text-xl font-bold text-gray-700">
                             {mockActiveQueue.estimatedTime}
                           </span>
                         </div>
@@ -242,7 +249,7 @@ export default function CustomerDashboard() {
                         </span>
                         <div className="flex items-center gap-2">
                           <NotificationOutlined className="text-green-500 text-lg" />
-                          <span className="text-xl font-bold text-gray-700">
+                          <span className="text-lg md:text-xl font-bold text-gray-700">
                             {mockActiveQueue.currentServing}
                           </span>
                         </div>
@@ -251,12 +258,15 @@ export default function CustomerDashboard() {
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center h-full bg-white text-center p-8 space-y-4">
-                  <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center">
-                    <SmileOutlined className="text-4xl text-gray-300" />
+                <div className="flex flex-col items-center justify-center h-[250px] lg:h-full bg-white text-center p-8 space-y-4">
+                  <div className="w-16 h-16 md:w-20 md:h-20 bg-gray-50 rounded-full flex items-center justify-center">
+                    <SmileOutlined className="text-3xl md:text-4xl text-gray-300" />
                   </div>
                   <div>
-                    <Title level={4} className="text-gray-400 m-0">
+                    <Title
+                      level={4}
+                      className="text-gray-400 m-0 text-base md:text-lg"
+                    >
                       Tidak ada antrian aktif
                     </Title>
                   </div>
@@ -280,7 +290,7 @@ export default function CustomerDashboard() {
               </div>
             </div>
             <Card
-              className={`shadow-sm hover:shadow-md transition-shadow duration-300 rounded-2xl border-none overflow-hidden ${CARD_HEIGHT_CLASS}`}
+              className={CARD_HEIGHT_CLASS}
               bodyStyle={{
                 padding: "20px",
                 height: "100%",
@@ -288,8 +298,7 @@ export default function CustomerDashboard() {
                 flexDirection: "column",
               }}
             >
-              {/* Gunakan overflow-y-auto di sini agar list bisa di-scroll tapi card tetap diam */}
-              <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
+              <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 min-h-[200px]">
                 <List
                   itemLayout="horizontal"
                   dataSource={mockServices}
@@ -297,12 +306,12 @@ export default function CustomerDashboard() {
                   renderItem={(item) => (
                     <div className="group flex items-center gap-4 p-3 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all cursor-pointer mb-3 last:mb-0">
                       <div
-                        className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl shadow-sm ${item.color} flex-shrink-0`}
+                        className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-lg md:text-xl shadow-sm ${item.color} flex-shrink-0`}
                       >
                         {item.icon}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-gray-800 m-0 truncate group-hover:text-blue-700">
+                        <h4 className="font-bold text-gray-800 m-0 truncate text-sm md:text-base group-hover:text-blue-700">
                           {item.name}
                         </h4>
                         <Text type="secondary" className="text-xs block mt-0.5">
@@ -314,14 +323,12 @@ export default function CustomerDashboard() {
                   )}
                 />
               </div>
-
               <div className="mt-auto pt-4 border-t border-gray-50 bg-white z-10">
                 <Button
                   block
                   type="primary"
                   size="large"
-                  href="#"
-                  className="bg-blue-600 hover:bg-blue-700 border-none h-11 font-semibold shadow-lg shadow-blue-200 rounded-xl flex items-center justify-center gap-2"
+                  className="bg-blue-600 hover:bg-blue-700 border-none h-10 md:h-11 font-semibold shadow-lg shadow-blue-200 rounded-xl flex items-center justify-center gap-2 text-sm md:text-base"
                 >
                   Lihat Semua Layanan <RightOutlined className="text-xs" />
                 </Button>
@@ -331,7 +338,7 @@ export default function CustomerDashboard() {
         </Row>
 
         {/* --- BOTTOM ROW --- */}
-        <Row gutter={[32, 32]}>
+        <Row gutter={[16, 16]}>
           {/* 3. INFORMATION BANNER */}
           <Col xs={24} md={8}>
             <Text
@@ -341,10 +348,10 @@ export default function CustomerDashboard() {
               INFORMASI
             </Text>
             <Card
-              className={`shadow-sm hover:shadow-md transition-shadow duration-300 rounded-2xl border-none overflow-hidden ${CARD_HEIGHT_CLASS}`}
+              className={CARD_HEIGHT_CLASS}
               bodyStyle={{ padding: 0, height: "100%" }}
             >
-              <div className="h-full relative group cursor-pointer">
+              <div className="h-[250px] lg:h-full relative group cursor-pointer">
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent z-10 opacity-90"></div>
                 <img
                   src="https://img.freepik.com/free-photo/doctor-nurses-special-equipment_23-2148980721.jpg"
@@ -355,10 +362,10 @@ export default function CustomerDashboard() {
                   <Tag className="bg-blue-600 border-none text-white px-2 py-0.5 mb-3 text-[10px] font-bold rounded">
                     TERBARU
                   </Tag>
-                  <h3 className="text-xl font-bold leading-tight mb-2 group-hover:text-blue-200 transition-colors">
+                  <h3 className="text-lg md:text-xl font-bold leading-tight mb-2 group-hover:text-blue-200 transition-colors">
                     Jaga Kesehatan di Musim Hujan
                   </h3>
-                  <p className="text-sm text-gray-300 line-clamp-2 leading-relaxed">
+                  <p className="text-xs md:text-sm text-gray-300 line-clamp-2 leading-relaxed">
                     Tips menjaga imun tubuh agar tetap fit selama musim
                     pancaroba.
                   </p>
@@ -386,7 +393,7 @@ export default function CustomerDashboard() {
               />
             </div>
             <Card
-              className={`shadow-sm hover:shadow-md transition-shadow duration-300 rounded-2xl border-none overflow-hidden ${CARD_HEIGHT_CLASS}`}
+              className={CARD_HEIGHT_CLASS}
               bodyStyle={{
                 padding: 0,
                 height: "100%",
@@ -394,12 +401,11 @@ export default function CustomerDashboard() {
                 flexDirection: "column",
               }}
             >
-              {/* Area Scrollable */}
-              <div className="flex-1 overflow-y-auto custom-scrollbar">
+              <div className="flex-1 overflow-y-auto custom-scrollbar min-h-[200px]">
                 <List
                   dataSource={mockHistory}
                   renderItem={(item) => (
-                    <div className="px-6 py-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 flex items-start gap-4 cursor-pointer group">
+                    <div className="px-4 md:px-6 py-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 flex items-start gap-3 md:gap-4 cursor-pointer group">
                       <div
                         className={`w-2 h-2 rounded-full mt-2.5 flex-shrink-0 ${
                           item.type === "success"
@@ -409,18 +415,21 @@ export default function CustomerDashboard() {
                             : "bg-red-500"
                         }`}
                       ></div>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <Text
                           strong
-                          className="text-gray-700 block text-sm group-hover:text-blue-600 transition-colors"
+                          className="text-gray-700 block text-sm group-hover:text-blue-600 transition-colors truncate"
                         >
                           {item.title}
                         </Text>
-                        <Text type="secondary" className="text-xs">
+                        <Text
+                          type="secondary"
+                          className="text-xs truncate block"
+                        >
                           {item.desc}
                         </Text>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex-shrink-0">
                         <Text className="text-[10px] font-bold text-gray-400 block mb-1 bg-gray-100 px-2 py-0.5 rounded">
                           {item.date}
                         </Text>
@@ -429,7 +438,6 @@ export default function CustomerDashboard() {
                   )}
                 />
               </div>
-              {/* Footer Tetap */}
               <div className="p-3 text-center border-t border-gray-100 bg-white z-10 mt-auto">
                 <Button
                   type="link"
@@ -442,7 +450,7 @@ export default function CustomerDashboard() {
             </Card>
           </Col>
 
-          {/* 5. PROFILE SAYA (DATA REAL) */}
+          {/* 5. PROFILE SAYA */}
           <Col xs={24} md={8}>
             <Text
               strong
@@ -451,7 +459,7 @@ export default function CustomerDashboard() {
               PROFILE SAYA
             </Text>
             <Card
-              className={`shadow-sm hover:shadow-md transition-shadow duration-300 rounded-2xl border-none overflow-hidden ${CARD_HEIGHT_CLASS}`}
+              className={CARD_HEIGHT_CLASS}
               bodyStyle={{
                 padding: "24px",
                 height: "100%",
@@ -461,8 +469,8 @@ export default function CustomerDashboard() {
               }}
             >
               <div>
-                <div className="flex items-center gap-5 mb-6">
-                  <div className="relative">
+                <div className="flex items-center gap-4 md:gap-5 mb-6">
+                  <div className="relative flex-shrink-0">
                     <Avatar
                       size={64}
                       icon={<UserOutlined />}
@@ -470,9 +478,9 @@ export default function CustomerDashboard() {
                     />
                     <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
                   </div>
-                  <div>
+                  <div className="overflow-hidden">
                     <h3
-                      className="text-lg font-bold text-gray-800 m-0 truncate w-40"
+                      className="text-lg font-bold text-gray-800 m-0 truncate w-full"
                       title={loggedInUser?.name}
                     >
                       {loggedInUser?.name || "Pasien"}
@@ -498,7 +506,7 @@ export default function CustomerDashboard() {
                       Email
                     </span>
                     <span
-                      className="text-sm font-bold text-gray-800 truncate max-w-[150px]"
+                      className="text-sm font-bold text-gray-800 truncate max-w-[120px] md:max-w-[150px]"
                       title={loggedInUser?.email}
                     >
                       {loggedInUser?.email || "-"}
