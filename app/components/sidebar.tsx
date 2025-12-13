@@ -110,7 +110,7 @@ export default function Sidebar({ roleId }: SidebarProps) {
     roleId === 2 && {
       key: "orders",
       icon: <ShoppingCartOutlined />,
-      label: <Link href="/orders">{t.orders}</Link>,
+      label: <Link href="/order">Order</Link>,
     },
   ].filter(Boolean) as MenuProps["items"];
 

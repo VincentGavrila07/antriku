@@ -1,4 +1,5 @@
 import { Service, ServiceResponsePagination } from "@/types/Service";
+import { BookServicePayload, TrService } from "@/types/Service";
 import axios from "axios";
 import { UpdateServiceFormValues } from "@/types/Service";
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -16,6 +17,29 @@ const ServiceService = {
 
     const response = await axios.get<ServiceResponsePagination<Service[]>>(
       `${BASE_URL}/admin/get-all-services`,
+      {
+        params,
+        headers: token
+          ? { Authorization: `Bearer ${token}` }
+          : undefined,
+        withCredentials: !!token ? false : true,
+      }
+    );
+
+    return response.data;
+  },
+
+  getAllServiceNonAdmin: async (
+    params?: {
+      filters?: { name?: string };
+      page?: number;
+      pageSize?: number;
+    }
+  ): Promise<ServiceResponsePagination<Service[]>> => {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get<ServiceResponsePagination<Service[]>>(
+      `${BASE_URL}get-all-services`,
       {
         params,
         headers: token
@@ -52,7 +76,7 @@ const ServiceService = {
   },
 
   deleteService: async (id: string, token: string) => {
-      const response = await axios.delete(`${BASE_URL}/admin/delete-service/${id}`, {
+      const response = await axios.delete(`${BASE_URL}/admin/delete-services/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -77,6 +101,23 @@ const ServiceService = {
         return response.data;
     },
 
+   bookService: async (
+    payload: BookServicePayload
+  ): Promise<{ message: string; data: TrService }> => {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.post(
+      `${BASE_URL}/book-service`,
+      payload,
+      {
+        headers: token
+          ? { Authorization: `Bearer ${token}` }
+          : undefined,
+      }
+    );
+
+    return response.data;
+  },
 
 };
 

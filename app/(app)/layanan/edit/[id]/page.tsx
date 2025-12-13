@@ -43,24 +43,27 @@ export default function EditServicePage() {
       try {
         const res = await ServiceService.getServiceById(id);
         setService(res.data);
-
-        // Set form values after service data is loaded
-        form.setFieldsValue({
-          name: res.data.name,
-          description: res.data.description,
-          assigned_user_ids: res.data.assigned_user_ids || [],
-          is_active: res.data.is_active,
-          estimated_time: res.data.estimated_time
-            ? moment(res.data.estimated_time, "HH:mm:ss")
-            : null,
-        });
       } catch (error) {
         console.error(error);
         notification.error({ title: "Gagal memuat data service" });
       }
     };
     fetchService();
-  }, [id, form]);
+  }, [id]);
+
+  // Set form values setelah service siap
+  useEffect(() => {
+    if (!service) return;
+
+    form.setFieldsValue({
+      name: service.name,
+      code: service.code,
+      description: service.description,
+      assigned_user_ids: service.assigned_user_ids || [],
+      is_active: service.is_active,
+      estimated_time: service.estimated_time ? moment(service.estimated_time, "HH:mm:ss") : null,
+    });
+  }, [service, form]);
 
   const handleFormSubmit = async (
     values: AddServiceFormValues & { estimated_time?: Moment | null; is_active?: boolean }
@@ -70,16 +73,14 @@ export default function EditServicePage() {
       const payload: AddServiceFormValues & { is_active: boolean } = {
         ...values,
         assigned_user_ids: values.assigned_user_ids ?? [],
-        estimated_time: values.estimated_time
-          ? values.estimated_time.format("HH:mm:ss")
-          : null,
+        estimated_time: values.estimated_time ? values.estimated_time.format("HH:mm:ss") : null,
         is_active: values.is_active ?? true,
       };
 
       await ServiceService.updateService(id, payload);
 
       notification.success({ title: "Service berhasil diperbarui" });
-      router.push("/admin/layanan");
+      router.push("/layanan");
     } catch (error) {
       console.error(error);
       notification.error({ title: "Gagal memperbarui service" });
@@ -119,6 +120,14 @@ export default function EditServicePage() {
           rules={[{ required: true, message: "Nama service harus diisi" }]}
         >
           <Input placeholder="Masukkan nama service" />
+        </Form.Item>
+
+        <Form.Item
+          label="Kode Service"
+          name="code"
+          rules={[{ required: true, message: "Kode Service harus diisi" }]}
+        >
+          <Input placeholder="Masukkan kode service" />
         </Form.Item>
 
         <Form.Item label="Deskripsi" name="description">
