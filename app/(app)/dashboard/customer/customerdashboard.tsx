@@ -10,116 +10,29 @@ import {
   Col,
   Tag,
   Button,
-  List,
   Avatar,
   Badge,
 } from "antd";
 import {
   ClockCircleOutlined,
-  MedicineBoxOutlined,
   SmileOutlined,
   RightOutlined,
-  HistoryOutlined,
   NotificationOutlined,
   UserOutlined,
-  ExperimentOutlined,
   HeartOutlined,
-  InfoCircleOutlined,
-  WarningOutlined,
+  ExperimentOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import UserService from "@/services/UserService";
 import { User } from "@/types/User";
+import ServiceService from "@/services/ServiceService";
 import { useRouter } from "next/navigation";
 
 const { Title, Text } = Typography;
 
-// --- MOCK DATA ---
-const mockActiveQueue = {
-  hasQueue: true,
-  serviceName: "Poli Gigi",
-  queueNumber: "B-005",
-  status: "waiting",
-  estimatedTime: "15 Menit",
-  currentServing: "B-003",
-  location: "Lantai 2, Ruang 204",
-};
-
-const mockServices = [
-  {
-    id: 1,
-    name: "Poli Umum",
-    icon: <UserOutlined />,
-    open: "08:00 - 20:00",
-    color: "text-blue-600 bg-blue-50",
-  },
-  {
-    id: 2,
-    name: "Poli Gigi",
-    icon: <SmileOutlined />,
-    open: "09:00 - 17:00",
-    color: "text-teal-600 bg-teal-50",
-  },
-  {
-    id: 3,
-    name: "Poli Anak",
-    icon: <HeartOutlined />,
-    open: "08:00 - 14:00",
-    color: "text-pink-600 bg-pink-50",
-  },
-  {
-    id: 4,
-    name: "Laboratorium",
-    icon: <ExperimentOutlined />,
-    open: "24 Jam",
-    color: "text-purple-600 bg-purple-50",
-  },
-  {
-    id: 5,
-    name: "Farmasi",
-    icon: <MedicineBoxOutlined />,
-    open: "08:00 - 22:00",
-    color: "text-indigo-600 bg-indigo-50",
-  },
-];
-
-const mockHistory = [
-  {
-    id: 1,
-    title: "Poli Gigi",
-    desc: "Selesai - drg. Sarah",
-    date: "09 Des",
-    type: "success",
-  },
-  {
-    id: 2,
-    title: "Poli Umum",
-    desc: "Selesai - dr. Budi",
-    date: "01 Des",
-    type: "success",
-  },
-  {
-    id: 3,
-    title: "Lab Darah",
-    desc: "Menunggu Hasil",
-    date: "25 Nov",
-    type: "warning",
-  },
-  {
-    id: 4,
-    title: "Poli Anak",
-    desc: "Dibatalkan",
-    date: "10 Nov",
-    type: "danger",
-  },
-  {
-    id: 5,
-    title: "Farmasi",
-    desc: "Obat Diambil",
-    date: "05 Nov",
-    type: "success",
-  },
-];
+// --- CONFIG CARD HEIGHT RESPONSIVE ---
+const CARD_HEIGHT_CLASS =
+  "h-auto lg:h-[360px] shadow-sm hover:shadow-md transition-shadow duration-300 rounded-2xl border-none overflow-hidden flex flex-col";
 
 export default function CustomerDashboard() {
   const { translations, loading: langLoading } = useLanguage();
@@ -127,10 +40,31 @@ export default function CustomerDashboard() {
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") ?? "" : "";
+
   const { data: loggedInUser, isLoading: userLoading } = useQuery<User>({
     queryKey: ["profile-me"],
     queryFn: () => UserService.getMe(token),
     enabled: !!token,
+  });
+
+  // --- FETCH ACTIVE QUEUE ---
+  const { data: activeQueue, isLoading: queueLoading } = useQuery({
+    queryKey: ["active-queue", loggedInUser?.id],
+    queryFn: async () => {
+      if (!loggedInUser) return null;
+      const res = await ServiceService.getActiveQueue(loggedInUser.id);
+      return res.data;
+    },
+    enabled: !!loggedInUser,
+  });
+
+  // --- FETCH AVAILABLE SERVICES ---
+  const { data: services, isLoading: servicesLoading } = useQuery({
+    queryKey: ["services"],
+    queryFn: async () => {
+      const res = await ServiceService.getAllService({ page: 1, pageSize: 50 });
+      return res.data;
+    },
   });
 
   if (langLoading || userLoading || !translations) {
@@ -141,16 +75,10 @@ export default function CustomerDashboard() {
     );
   }
 
-  // --- CONFIG TINGGI CARD RESPONSIVE ---
-  // Mobile: h-auto (fleksibel mengikuti konten)
-  // Desktop (lg): h-[360px] (simetris agar rapi)
-  const CARD_HEIGHT_CLASS =
-    "h-auto lg:h-[360px] shadow-sm hover:shadow-md transition-shadow duration-300 rounded-2xl border-none overflow-hidden flex flex-col";
-
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6 lg:p-10 font-sans pb-20">
       <div className="max-w-[1400px] mx-auto space-y-6">
-        {/* Header Title */}
+        {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-2">
           <div>
             <Title
@@ -170,52 +98,50 @@ export default function CustomerDashboard() {
           </div>
         </div>
 
-        {/* --- TOP ROW --- */}
+        {/* Top Row */}
         <Row gutter={[16, 16]}>
-          {/* 1. ACTIVE QUEUE */}
+          {/* Active Queue */}
           <Col xs={24} lg={16}>
             <div className="flex justify-between items-center mb-3">
               <Text
                 strong
                 className="text-gray-500 text-xs tracking-wider uppercase"
               >
-                ANTRIAN SAAT INI
+                ANTRIAN AKTIF KAMU
               </Text>
             </div>
             <Card
               className={CARD_HEIGHT_CLASS}
-              bodyStyle={{
-                padding: 0,
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
+              styles={{
+                body: { padding: 0, flex: 1, display: "flex", flexDirection: "column" },
               }}
             >
-              {mockActiveQueue.hasQueue ? (
+              {queueLoading ? (
+                <div className="flex justify-center items-center h-full">
+                  <Spin size="large" />
+                </div>
+              ) : activeQueue?.data? (
                 <div className="flex flex-col md:flex-row h-full">
-                  {/* Left Side: Number */}
+                  {/* Left: Nomor Antrian */}
                   <div className="bg-blue-600 p-6 md:p-8 text-white flex flex-col justify-between md:w-5/12 relative overflow-hidden group min-h-[200px]">
-                    <div className="absolute -top-6 -right-6 opacity-10 text-[80px] md:text-[100px] group-hover:rotate-12 transition-transform duration-700">
-                      <HistoryOutlined />
-                    </div>
                     <div className="relative z-10">
                       <Text className="text-blue-100 text-xs md:text-sm font-medium opacity-90">
                         Nomor Antrian
                       </Text>
                       <h1 className="text-6xl md:text-7xl font-black m-0 text-white tracking-tighter mt-1">
-                        {mockActiveQueue.queueNumber}
+                        {activeQueue.data.your_queue.queue_code}
                       </h1>
                     </div>
                     <div className="mt-auto relative z-10 pt-4">
                       <Tag className="bg-white/20 text-white border-none px-3 py-1 text-xs font-bold rounded-full backdrop-blur-sm uppercase">
-                        {mockActiveQueue.status === "waiting"
-                          ? "MENUNGGU DIPANGGIL"
-                          : "SEDANG DIPANGGIL"}
+                        {activeQueue.data.your_queue.status === "waiting"
+                          ? "MENUNGGU PROSES"
+                          : "SEDANG PROSES"}
                       </Tag>
                     </div>
                   </div>
 
-                  {/* Right Side: Details */}
+                  {/* Right: Details */}
                   <div className="p-6 md:p-8 flex-1 flex flex-col justify-center bg-white relative">
                     <div className="mb-6">
                       <Text
@@ -228,7 +154,7 @@ export default function CustomerDashboard() {
                         level={2}
                         className="m-0 text-gray-800 font-bold text-xl md:text-3xl"
                       >
-                        {mockActiveQueue.serviceName}
+                        {activeQueue.data.service_name}
                       </Title>
                     </div>
                     <div className="grid grid-cols-2 gap-4 md:gap-8 border-t border-gray-100 pt-6">
@@ -239,7 +165,7 @@ export default function CustomerDashboard() {
                         <div className="flex items-center gap-2">
                           <ClockCircleOutlined className="text-blue-500 text-lg" />
                           <span className="text-lg md:text-xl font-bold text-gray-700">
-                            {mockActiveQueue.estimatedTime}
+                            {activeQueue.data.estimated_waiting_time}
                           </span>
                         </div>
                       </div>
@@ -250,7 +176,7 @@ export default function CustomerDashboard() {
                         <div className="flex items-center gap-2">
                           <NotificationOutlined className="text-green-500 text-lg" />
                           <span className="text-lg md:text-xl font-bold text-gray-700">
-                            {mockActiveQueue.currentServing}
+                            {activeQueue.data.current_serving}
                           </span>
                         </div>
                       </div>
@@ -275,7 +201,7 @@ export default function CustomerDashboard() {
             </Card>
           </Col>
 
-          {/* 2. PILIH LAYANAN */}
+          {/* Pilih Layanan */}
           <Col xs={24} lg={8}>
             <div className="flex justify-between items-center mb-3">
               <Text
@@ -284,44 +210,33 @@ export default function CustomerDashboard() {
               >
                 PILIH LAYANAN
               </Text>
-              <div className="flex items-center gap-1 text-green-600 bg-green-50 px-2 py-0.5 rounded text-[10px] font-bold">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>{" "}
-                Buka
-              </div>
             </div>
             <Card
               className={CARD_HEIGHT_CLASS}
-              bodyStyle={{
-                padding: "20px",
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-              }}
+              styles={{ body: { padding: 20, height: "100%", display: "flex", flexDirection: "column" } }}
             >
               <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 min-h-[200px]">
-                <List
-                  itemLayout="horizontal"
-                  dataSource={mockServices}
-                  split={false}
-                  renderItem={(item) => (
-                    <div className="group flex items-center gap-4 p-3 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all cursor-pointer mb-3 last:mb-0">
-                      <div
-                        className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-lg md:text-xl shadow-sm ${item.color} flex-shrink-0`}
-                      >
-                        {item.icon}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-gray-800 m-0 truncate text-sm md:text-base group-hover:text-blue-700">
-                          {item.name}
-                        </h4>
-                        <Text type="secondary" className="text-xs block mt-0.5">
-                          {item.open}
-                        </Text>
-                      </div>
-                      <RightOutlined className="text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-transform" />
+                {services?.map((item) => (
+                  <div
+                    key={item.id}
+                    className="group flex items-center gap-4 p-3 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all cursor-pointer mb-3 last:mb-0"
+                  >
+                    <div
+                      className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-lg md:text-xl shadow-sm bg-blue-50 text-blue-600 flex-shrink-0`}
+                    >
+                      <UserOutlined />
                     </div>
-                  )}
-                />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-gray-800 m-0 truncate text-sm md:text-base group-hover:text-blue-700">
+                        {item.name}
+                      </h4>
+                      {/* <Text type="secondary" className="text-xs block mt-0.5">
+                        {item.open || "-"}
+                      </Text> */}
+                    </div>
+                    <RightOutlined className="text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                ))}
               </div>
               <div className="mt-auto pt-4 border-t border-gray-50 bg-white z-10">
                 <Button
@@ -337,9 +252,9 @@ export default function CustomerDashboard() {
           </Col>
         </Row>
 
-        {/* --- BOTTOM ROW --- */}
+        {/* Bottom Row: Riwayat & Profil */}
         <Row gutter={[16, 16]}>
-          {/* 3. INFORMATION BANNER */}
+          {/* Informasi Banner */}
           <Col xs={24} md={8}>
             <Text
               strong
@@ -349,7 +264,7 @@ export default function CustomerDashboard() {
             </Text>
             <Card
               className={CARD_HEIGHT_CLASS}
-              bodyStyle={{ padding: 0, height: "100%" }}
+              styles={{ body: { padding: 0, height: "100%" } }}
             >
               <div className="h-[250px] lg:h-full relative group cursor-pointer">
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent z-10 opacity-90"></div>
@@ -366,15 +281,14 @@ export default function CustomerDashboard() {
                     Jaga Kesehatan di Musim Hujan
                   </h3>
                   <p className="text-xs md:text-sm text-gray-300 line-clamp-2 leading-relaxed">
-                    Tips menjaga imun tubuh agar tetap fit selama musim
-                    pancaroba.
+                    Tips menjaga imun tubuh agar tetap fit selama musim pancaroba.
                   </p>
                 </div>
               </div>
             </Card>
           </Col>
 
-          {/* 4. RIWAYAT TERAKHIR */}
+          {/* Riwayat */}
           <Col xs={24} md={8}>
             <div className="flex justify-between items-center mb-3">
               <Text
@@ -384,59 +298,13 @@ export default function CustomerDashboard() {
                 RIWAYAT TERAKHIR
               </Text>
               <Badge
-                count={mockHistory.length}
-                style={{
-                  backgroundColor: "#ef4444",
-                  fontSize: "10px",
-                  boxShadow: "none",
-                }}
+                count={0}
+                style={{ backgroundColor: "#ef4444", fontSize: "10px", boxShadow: "none" }}
               />
             </div>
-            <Card
-              className={CARD_HEIGHT_CLASS}
-              bodyStyle={{
-                padding: 0,
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
+            <Card className={CARD_HEIGHT_CLASS} styles={{ body: { padding: 0, height: "100%" } }}>
               <div className="flex-1 overflow-y-auto custom-scrollbar min-h-[200px]">
-                <List
-                  dataSource={mockHistory}
-                  renderItem={(item) => (
-                    <div className="px-4 md:px-6 py-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 flex items-start gap-3 md:gap-4 cursor-pointer group">
-                      <div
-                        className={`w-2 h-2 rounded-full mt-2.5 flex-shrink-0 ${
-                          item.type === "success"
-                            ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"
-                            : item.type === "warning"
-                            ? "bg-orange-500"
-                            : "bg-red-500"
-                        }`}
-                      ></div>
-                      <div className="flex-1 min-w-0">
-                        <Text
-                          strong
-                          className="text-gray-700 block text-sm group-hover:text-blue-600 transition-colors truncate"
-                        >
-                          {item.title}
-                        </Text>
-                        <Text
-                          type="secondary"
-                          className="text-xs truncate block"
-                        >
-                          {item.desc}
-                        </Text>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <Text className="text-[10px] font-bold text-gray-400 block mb-1 bg-gray-100 px-2 py-0.5 rounded">
-                          {item.date}
-                        </Text>
-                      </div>
-                    </div>
-                  )}
-                />
+                {/* TODO: ambil riwayat user dari API */}
               </div>
               <div className="p-3 text-center border-t border-gray-100 bg-white z-10 mt-auto">
                 <Button
@@ -450,7 +318,7 @@ export default function CustomerDashboard() {
             </Card>
           </Col>
 
-          {/* 5. PROFILE SAYA */}
+          {/* Profil */}
           <Col xs={24} md={8}>
             <Text
               strong
@@ -460,13 +328,7 @@ export default function CustomerDashboard() {
             </Text>
             <Card
               className={CARD_HEIGHT_CLASS}
-              bodyStyle={{
-                padding: "24px",
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-              }}
+              styles={{ body: { padding: 24, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" } }}
             >
               <div>
                 <div className="flex items-center gap-4 md:gap-5 mb-6">

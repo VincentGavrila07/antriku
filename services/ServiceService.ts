@@ -119,6 +119,10 @@ const ServiceService = {
     return response.data;
   },
 
+  getActiveQueue(userId: number) {
+    return axios.get(`${BASE_URL}/queues/active/${userId}`);
+  },
+
 };
 
 export default ServiceService;

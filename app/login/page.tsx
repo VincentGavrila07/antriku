@@ -29,7 +29,7 @@ const LoginPage = () => {
           localStorage.setItem("token", data.token);
 
           await refreshPermissions();
-
+          localStorage.setItem("user", JSON.stringify(data.user));
           router.push("/dashboard");
         },
         onError: (err: Error) => {
