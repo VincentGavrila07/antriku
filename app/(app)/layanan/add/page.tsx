@@ -40,12 +40,18 @@ export default function AddServicePage() {
       // Convert Moment to string HH:mm:ss
       const payload: AddServiceFormValues = {
         ...values,
+        code: values.code,
         estimated_time: values.estimated_time ? values.estimated_time.format("HH:mm:ss") : undefined,
         assigned_user_ids: values.assigned_user_ids ?? [],
         is_active: true,
+      } as const;
+
+      const sanitizedPayload = {
+        ...payload,
+        estimated_time: payload.estimated_time ?? undefined,
       };
 
-      await ServiceService.addService(payload);
+      await ServiceService.addService(sanitizedPayload);
 
       notification.success({ title: "Service berhasil ditambahkan" });
       router.push("/layanan");
@@ -87,6 +93,14 @@ export default function AddServicePage() {
           label="Nama Service"
           name="name"
           rules={[{ required: true, message: "Nama service harus diisi" }]}
+        >
+          <Input placeholder="Masukkan nama service" />
+        </Form.Item>
+
+        <Form.Item
+          label="Kode Service"
+          name="code"
+          rules={[{ required: true, message: "Kode Service harus diisi" }]}
         >
           <Input placeholder="Masukkan nama service" />
         </Form.Item>

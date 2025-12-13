@@ -1,23 +1,20 @@
 "use client";
 import { Table, Spin, Button } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
-import { User } from "@/types/User";
-import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useRouter } from "next/navigation"
-import { TableServiceProps } from "../props/table-service-props";
+import { ShopOutlined } from "@ant-design/icons";
+import { TableServiceOrderProps } from "../props/table-service-order-prps";
 import { Service } from "@/types/Service";
 
-export default function TableService({
+export default function TableServiceOrder({
   data,
   total,
   page,
   pageSize,
   isLoading = false,
   onChange,
-  onDelete
-}: TableServiceProps) {
+  onOrder
+}: TableServiceOrderProps) {
 
-  const router = useRouter();
 
   const columns: ColumnsType<Service> = [
     {
@@ -35,12 +32,6 @@ export default function TableService({
       render: (text) => <span className="font-medium text-gray-800">{text}</span>,
     },
     {
-      title: "Code",
-      dataIndex: "code",
-      key: "code",
-      render: (text) => <span className="font-medium text-gray-800">{text}</span>,
-    },
-    {
       title: "Description",
       dataIndex: "description",
       key: "description",
@@ -54,20 +45,9 @@ export default function TableService({
       render: (_, record) => (
         <div className="flex justify-center gap-2">
           <Button
-            onClick={() => {
-              router.push(`layanan/edit/${record.id}`);
-            }}
+            onClick={() => onOrder(record)}
           >
-            <EditOutlined />
-          </Button>
-          <Button
-            onClick={() => {
-              if (onDelete) {
-                onDelete(record.id.toString()); 
-              }
-            }}
-          >
-            <DeleteOutlined />
+            <ShopOutlined />
           </Button>
         </div>
       ),
