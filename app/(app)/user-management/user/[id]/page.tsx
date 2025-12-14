@@ -17,7 +17,7 @@ export default function UserDetailPage() {
   const { translations, loading: langLoading } = useLanguage();
   const { permissions, loading: permissionLoading } = usePermission();
 
-  const id = params.id as string;
+  const id = params?.id as string;
 
 
   const {data : userData, isLoading, error } = useQuery<User>({

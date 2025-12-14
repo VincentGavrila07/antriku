@@ -9,7 +9,8 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Role } from "@/types/Role";
 
 export default function EditPermissionPage() {
-  const { id } = useParams(); 
+  const params = useParams();
+  const id = params?.id as string;
   const router = useRouter();
 
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);

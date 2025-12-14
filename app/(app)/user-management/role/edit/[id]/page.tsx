@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 export default function EditRolePage() {
   const router = useRouter();
   const params = useParams();
-  const id = params.id as string;
+  const id = params?.id as string;
 
   const { translations, loading: langLoading } = useLanguage();
   const { permissions, loading: permissionLoading } = usePermission();
