@@ -3,6 +3,7 @@
 import React, { useState, useEffect, memo } from "react";
 import { User } from "@/types/User";
 import { useLanguage } from "@/app/languange-context";
+import type { Translations } from "@/app/languange-context";
 import {
   Spin,
   Card,
@@ -161,12 +162,12 @@ const staffPerformance = [
 interface AdminDashboardProps {
   user: User;
 }
-
 export default function AdminDashboard({ user }: AdminDashboardProps) {
   const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["dashboard"] | undefined = translations?.dashboard;
   const [searchText, setSearchText] = useState("");
 
-  if (langLoading || !translations) {
+  if (langLoading || !t) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Spin size="large" />
@@ -200,13 +201,13 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
             />
             <div>
               <Title level={3} className="text-gray-800 m-0 font-bold">
-                {translations.Sidebar?.adminDashboard || "Admin Dashboard"}
+                {t.AdminDashboard}
               </Title>
               <div className="flex items-center gap-2">
-                <Text type="secondary">Selamat Datang,</Text>
+                <Text type="secondary">{t.Welcome}</Text>
                 <Text strong>{user.name}</Text>
                 <Tag color="purple" className="ml-2 border-none font-bold">
-                  ADMINISTRATOR
+                  {t.Administrator}
                 </Tag>
               </div>
             </div>
@@ -216,7 +217,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
               type="secondary"
               className="text-xs uppercase font-bold tracking-wider"
             >
-              Waktu Server
+              {t.ServerTime}
             </Text>
             <RealtimeClock />
           </div>
@@ -233,14 +234,14 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
               <Statistic
                 title={
                   <span className="text-gray-500 font-medium">
-                    Total Pasien
+                    {t.TotalPatients}
                   </span>
                 }
                 value={mockStats.totalPatients}
                 styles={{ content: { fontWeight: 800, color: "#1f2937" } }}
               />
               <div className="mt-2 text-xs text-green-500 flex items-center gap-1 font-bold">
-                <ArrowUpOutlined /> +12% growth
+                <ArrowUpOutlined /> {t.Growth}
               </div>
             </Card>
           </Col>
@@ -251,13 +252,15 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
               </div>
               <Statistic
                 title={
-                  <span className="text-gray-500 font-medium">Total Staff</span>
+                  <span className="text-gray-500 font-medium">
+                    {t.TotalStaff}
+                  </span>
                 }
                 value={mockStats.totalStaff}
                 valueStyle={{ fontWeight: 800, color: "#1f2937" }}
               />
               <div className="mt-2 text-xs text-gray-400">
-                4 Dokter Sedang Aktif
+                {t.ActiveDoctors}
               </div>
             </Card>
           </Col>
@@ -270,14 +273,14 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
               <Statistic
                 title={
                   <span className="text-gray-500 font-medium">
-                    Antrian Hari Ini
+                    {t.TodayQueues}
                   </span>
                 }
                 value={mockStats.todayQueues}
                 valueStyle={{ fontWeight: 800, color: "#1f2937" }}
               />
               <div className="mt-2 text-xs text-green-500 flex items-center gap-1 font-bold">
-                <ArrowUpOutlined /> Ramai lancar
+                <ArrowUpOutlined /> {t.BusySmooth}
               </div>
             </Card>
           </Col>
@@ -290,7 +293,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
               <Statistic
                 title={
                   <span className="text-gray-500 font-medium">
-                    Layanan Aktif
+                    {t.ActiveServices}
                   </span>
                 }
                 value={mockStats.activeServices}
@@ -316,10 +319,10 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
               title={
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4">
                   <span className="font-bold text-lg text-gray-800">
-                    Status Layanan & Antrian
+                    {t.ServiceStatusAndQueue}
                   </span>
                   <Input
-                    placeholder="Cari Layanan atau Staff..."
+                    placeholder={t.SearchServiceOrStaff}
                     prefix={<SearchOutlined className="text-gray-400" />}
                     onChange={(e) => setSearchText(e.target.value)}
                     className="w-full md:w-64 rounded-lg"
@@ -340,7 +343,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
                 scroll={{ x: 600 }}
                 columns={[
                   {
-                    title: "Nama Layanan",
+                    title: t.ServiceName,
                     dataIndex: "name",
                     key: "name",
                     render: (text) => (
@@ -350,26 +353,32 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
                     ),
                   },
                   {
-                    title: "Status",
+                    title: t.Status,
                     dataIndex: "status",
                     key: "status",
-                    render: (status) => (
-                      <Tag
-                        color={
-                          status === "Buka"
-                            ? "green"
-                            : status === "Istirahat"
-                            ? "orange"
-                            : "red"
-                        }
-                        className="border-none font-bold rounded-md px-2"
-                      >
-                        {status.toUpperCase()}
-                      </Tag>
-                    ),
+                    render: (status) => {
+                      let label = status;
+                      if (status === "Buka") label = t.Open;
+                      else if (status === "Istirahat") label = t.Break;
+                      else if (status === "Tutup") label = t.Closed;
+                      return (
+                        <Tag
+                          color={
+                            status === "Buka"
+                              ? "green"
+                              : status === "Istirahat"
+                              ? "orange"
+                              : "red"
+                          }
+                          className="border-none font-bold rounded-md px-2"
+                        >
+                          {label.toUpperCase()}
+                        </Tag>
+                      );
+                    },
                   },
                   {
-                    title: "Staff",
+                    title: t.Staff,
                     dataIndex: "staff",
                     key: "staff",
                     render: (text) => (
@@ -384,12 +393,12 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
                     ),
                   },
                   {
-                    title: "Antrian",
+                    title: t.Queue,
                     dataIndex: "queues",
                     key: "queues",
                     render: (count) => (
                       <Tag color="blue" className="rounded-full px-3">
-                        {count} org
+                        {count} {t.People}
                       </Tag>
                     ),
                   },

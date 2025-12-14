@@ -2,6 +2,7 @@
 
 import React, { memo, useEffect, useState } from "react";
 import { useLanguage } from "@/app/languange-context";
+import type { Translations } from "@/app/languange-context";
 import {
   Spin,
   Card,
@@ -64,8 +65,9 @@ interface CustomerDashboardProps {
   user: User;
 }
 
-export default function CustomerDashboard({ user }: CustomerDashboardProps) {
+export default function CustomerDashboard(props: CustomerDashboardProps) {
   const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["dashboard"] | undefined = translations?.dashboard;
   const router = useRouter();
 
   const token =
@@ -97,7 +99,7 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
     },
   });
 
-  if (langLoading || userLoading || !translations) {
+  if (langLoading || userLoading || !t) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Spin size="large" />
@@ -115,10 +117,10 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
               level={3}
               className="text-gray-800 m-0 font-bold text-xl md:text-2xl"
             >
-              Dashboard Pasien
+              {t.PatientDashboard}
             </Title>
             <Text className="text-gray-500 text-sm md:text-base">
-              Selamat datang kembali, {loggedInUser?.name || "Pasien"}
+              {t.WelcomeBack.replace("{name}", loggedInUser?.name || "-")}
             </Text>
           </div>
           <div className="flex justify-between items-center px-6 py-4">
@@ -135,7 +137,7 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
                 strong
                 className="text-gray-500 text-xs tracking-wider uppercase"
               >
-                ANTRIAN AKTIF KAMU
+                {t.YourActiveQueue}
               </Text>
             </div>
             <Card
@@ -159,7 +161,7 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
                   <div className="bg-blue-600 p-6 md:p-8 text-white flex flex-col justify-between md:w-5/12 relative overflow-hidden group min-h-[200px]">
                     <div className="relative z-10">
                       <Text className="text-blue-100 text-xs md:text-sm font-medium opacity-90">
-                        Nomor Antrian
+                        {t.QueueNumber}
                       </Text>
                       <h1 className="text-6xl md:text-7xl font-black m-0 text-white tracking-tighter mt-1">
                         {activeQueue.data.your_queue.queue_code}
@@ -168,8 +170,8 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
                     <div className="mt-auto relative z-10 pt-4">
                       <Tag className="bg-white/20 text-white border-none px-3 py-1 text-xs font-bold rounded-full backdrop-blur-sm uppercase">
                         {activeQueue.data.your_queue.status === "waiting"
-                          ? "MENUNGGU PROSES"
-                          : "SEDANG PROSES"}
+                          ? t.WaitingProcess
+                          : t.InProcess}
                       </Tag>
                     </div>
                   </div>
@@ -181,7 +183,7 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
                         type="secondary"
                         className="uppercase text-[10px] font-bold tracking-widest text-gray-400"
                       >
-                        Layanan
+                        {t.Service}
                       </Text>
                       <Title
                         level={2}
@@ -193,7 +195,7 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
                     <div className="grid grid-cols-2 gap-4 md:gap-8 border-t border-gray-100 pt-6">
                       <div>
                         <span className="text-[10px] font-bold text-gray-400 uppercase block mb-1">
-                          Estimasi
+                          {t.Estimate}
                         </span>
                         <div className="flex items-center gap-2">
                           <ClockCircleOutlined className="text-blue-500 text-lg" />
@@ -204,7 +206,7 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
                       </div>
                       <div>
                         <span className="text-[10px] font-bold text-gray-400 uppercase block mb-1">
-                          Sedang Dilayani
+                          {t.BeingServed}
                         </span>
                         <div className="flex items-center gap-2">
                           <NotificationOutlined className="text-green-500 text-lg" />
@@ -226,7 +228,7 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
                       level={4}
                       className="text-gray-400 m-0 text-base md:text-lg"
                     >
-                      Tidak ada antrian aktif
+                      {t.NoActiveQueue}
                     </Title>
                   </div>
                 </div>
@@ -241,7 +243,7 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
                 strong
                 className="text-gray-500 text-xs tracking-wider uppercase"
               >
-                DAFTAR LAYANAN
+                {t.ServiceList}
               </Text>
             </div>
             <Card
@@ -286,7 +288,7 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
               strong
               className="text-gray-500 text-xs tracking-wider uppercase mb-3 block"
             >
-              INFORMASI
+              {t.Information}
             </Text>
             <Card
               className={CARD_HEIGHT_CLASS}
@@ -301,14 +303,13 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
                 />
                 <div className="absolute bottom-0 left-0 p-6 z-20 text-white w-full">
                   <Tag className="bg-blue-600 border-none text-white px-2 py-0.5 mb-3 text-[10px] font-bold rounded">
-                    TERBARU
+                    {t.Latest}
                   </Tag>
                   <h3 className="text-lg md:text-xl font-bold leading-tight mb-2 group-hover:text-blue-200 transition-colors">
-                    Jaga Kesehatan di Musim Hujan
+                    {t.RainySeasonHealth}
                   </h3>
                   <p className="text-xs md:text-sm text-gray-300 line-clamp-2 leading-relaxed">
-                    Tips menjaga imun tubuh agar tetap fit selama musim
-                    pancaroba.
+                    {t.ImmunityTips}
                   </p>
                 </div>
               </div>
@@ -320,7 +321,7 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
               strong
               className="text-gray-500 text-xs tracking-wider uppercase mb-3 block"
             >
-              PROFILE SAYA
+              {t.MyProfile}
             </Text>
             <Card
               className={CARD_HEIGHT_CLASS}
@@ -355,13 +356,13 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
                       type="secondary"
                       className="text-xs font-medium block mb-1"
                     >
-                      Pasien Regular
+                      {t.RegularPatient}
                     </Text>
                     <Tag
                       color="green"
                       className="border-none bg-green-50 text-green-600 font-bold text-[10px] rounded px-2"
                     >
-                      TERVERIFIKASI
+                      {t.Verified}
                     </Tag>
                   </div>
                 </div>
@@ -369,7 +370,7 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3.5 bg-gray-50 rounded-xl hover:bg-blue-50 transition-colors group">
                     <span className="text-xs text-gray-500 font-bold group-hover:text-blue-600">
-                      Email
+                      {t.Email}
                     </span>
                     <span
                       className="text-sm font-bold text-gray-800 truncate max-w-[120px] md:max-w-[150px]"
@@ -380,7 +381,7 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
                   </div>
                   <div className="flex justify-between items-center p-3.5 bg-gray-50 rounded-xl hover:bg-blue-50 transition-colors group">
                     <span className="text-xs text-gray-500 font-bold group-hover:text-blue-600">
-                      No. Telepon
+                      {t.PhoneNumber}
                     </span>
                     <span className="text-sm font-bold text-gray-800 flex items-center gap-1">
                       +62 812...
@@ -399,7 +400,7 @@ export default function CustomerDashboard({ user }: CustomerDashboardProps) {
                     }
                   }}
                 >
-                  Lihat Detail Profile
+                  {t.ViewProfileDetail}
                 </Button>
               </div>
             </Card>
