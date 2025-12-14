@@ -60,7 +60,11 @@ const RealtimeClock = memo(() => {
 });
 RealtimeClock.displayName = "RealtimeClock";
 
-export default function CustomerDashboard() {
+interface CustomerDashboardProps {
+  user: User;
+}
+
+export default function CustomerDashboard({ user }: CustomerDashboardProps) {
   const { translations, loading: langLoading } = useLanguage();
   const router = useRouter();
 
@@ -137,14 +141,19 @@ export default function CustomerDashboard() {
             <Card
               className={CARD_HEIGHT_CLASS}
               styles={{
-                body: { padding: 0, flex: 1, display: "flex", flexDirection: "column" },
+                body: {
+                  padding: 0,
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                },
               }}
             >
               {queueLoading ? (
                 <div className="flex justify-center items-center h-full">
                   <Spin size="large" />
                 </div>
-              ) : activeQueue?.data? (
+              ) : activeQueue?.data ? (
                 <div className="flex flex-col md:flex-row h-full">
                   {/* Left: Nomor Antrian */}
                   <div className="bg-blue-600 p-6 md:p-8 text-white flex flex-col justify-between md:w-5/12 relative overflow-hidden group min-h-[200px]">
@@ -237,7 +246,14 @@ export default function CustomerDashboard() {
             </div>
             <Card
               className={CARD_HEIGHT_CLASS}
-              styles={{ body: { padding: 20, height: "100%", display: "flex", flexDirection: "column" } }}
+              styles={{
+                body: {
+                  padding: 20,
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                },
+              }}
             >
               <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 min-h-[200px]">
                 {services?.map((item) => (
@@ -246,7 +262,7 @@ export default function CustomerDashboard() {
                     className="group flex items-center gap-4 p-3 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all cursor-pointer mb-3 last:mb-0"
                   >
                     <div
-                      className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-lg md:text-xl shadow-sm bg-blue-50 text-blue-600 flex-shrink-0`}
+                      className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-lg md:text-xl shadow-sm bg-blue-50 text-blue-600 shrink-0`}
                     >
                       <UserOutlined />
                     </div>
@@ -277,7 +293,7 @@ export default function CustomerDashboard() {
               styles={{ body: { padding: 0, height: "100%" } }}
             >
               <div className="h-[250px] lg:h-full relative group cursor-pointer">
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent z-10 opacity-90"></div>
+                <div className="absolute inset-0 bg-linear-to-t from-gray-900 via-gray-900/40 to-transparent z-10 opacity-90"></div>
                 <img
                   src="https://img.freepik.com/free-photo/doctor-nurses-special-equipment_23-2148980721.jpg"
                   alt="Info Banner"
@@ -291,7 +307,8 @@ export default function CustomerDashboard() {
                     Jaga Kesehatan di Musim Hujan
                   </h3>
                   <p className="text-xs md:text-sm text-gray-300 line-clamp-2 leading-relaxed">
-                    Tips menjaga imun tubuh agar tetap fit selama musim pancaroba.
+                    Tips menjaga imun tubuh agar tetap fit selama musim
+                    pancaroba.
                   </p>
                 </div>
               </div>
@@ -307,11 +324,19 @@ export default function CustomerDashboard() {
             </Text>
             <Card
               className={CARD_HEIGHT_CLASS}
-              styles={{ body: { padding: 24, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" } }}
+              styles={{
+                body: {
+                  padding: 24,
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                },
+              }}
             >
               <div>
                 <div className="flex items-center gap-4 md:gap-5 mb-6">
-                  <div className="relative flex-shrink-0">
+                  <div className="relative shrink-0">
                     <Avatar
                       size={64}
                       icon={<UserOutlined />}

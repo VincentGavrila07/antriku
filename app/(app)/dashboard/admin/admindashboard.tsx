@@ -197,7 +197,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
             <Avatar
               size={64}
               icon={<SettingOutlined />}
-              className="bg-blue-900 flex-shrink-0"
+              className="bg-blue-900 shrink-0"
             />
             <div>
               <Title level={3} className="text-gray-800 m-0 font-bold">

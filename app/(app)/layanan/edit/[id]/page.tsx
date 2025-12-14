@@ -15,7 +15,7 @@ import moment from "moment";
 export default function EditServicePage() {
   const router = useRouter();
   const params = useParams();
-  const id = params.id as string;
+  const id = params?.id as string;
 
   const { translations, loading: langLoading } = useLanguage();
   const [form] = Form.useForm();

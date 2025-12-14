@@ -73,7 +73,11 @@ const RealtimeClock = memo(() => {
 });
 RealtimeClock.displayName = "RealtimeClock";
 
-export default function StaffDashboard() {
+interface StaffDashboardProps {
+  user: User;
+}
+
+export default function StaffDashboard({ user }: StaffDashboardProps) {
   const queryClient = useQueryClient();
 
   const token =
@@ -86,7 +90,7 @@ export default function StaffDashboard() {
   });
 
   const [activeService, setActiveService] = useState<MyService | null>(null);
-  const todayDate = new Date().toISOString().slice(0, 10); 
+  const todayDate = new Date().toISOString().slice(0, 10);
 
   useEffect(() => {
     const stored = localStorage.getItem("myServices");
@@ -104,11 +108,11 @@ export default function StaffDashboard() {
       queryKey: ["total-serve-today", activeService?.id],
       queryFn: () =>
         ServiceService.getTotalServe({
-          service_id: activeService?.id, 
+          service_id: activeService?.id,
           queue_date: todayDate,
         }),
       enabled: !!activeService,
-      refetchInterval: 15000, 
+      refetchInterval: 15000,
     });
 
   const { data: queueResponse, isLoading: queueLoading } =
@@ -120,7 +124,7 @@ export default function StaffDashboard() {
           queue_date: todayDate,
         }),
       enabled: !!activeService,
-      refetchInterval: 5000, 
+      refetchInterval: 5000,
     });
 
   const [currentSession, setCurrentSession] =
@@ -141,8 +145,8 @@ export default function StaffDashboard() {
         queueNumber: `${queueResponse.service.code}-${processing.queue_number}`,
         patientName: processing.user?.name ?? "Pasien",
         serviceType: queueResponse.service.name,
-        checkInTime: processing.created_at, 
-        initialComplaint: processing.initial_complaint as string | undefined, 
+        checkInTime: processing.created_at,
+        initialComplaint: processing.initial_complaint as string | undefined,
       });
     } else {
       setCurrentSession(null);
@@ -189,7 +193,6 @@ export default function StaffDashboard() {
       queryClient.invalidateQueries({
         queryKey: ["total-serve-today", activeService?.id], // Invalidate total serve
       });
-
     } catch {
       message.error("Gagal menyelesaikan antrian");
     }
@@ -241,9 +244,9 @@ export default function StaffDashboard() {
               <div className="border border-gray-200 rounded-lg p-6 shadow-sm">
                 <div className="flex items-center gap-4">
                   <div className="bg-green-500 text-white w-16 h-16 flex items-center justify-center rounded-lg font-bold text-2xl">
-                    {currentQueue.queueNumber.split('-').pop()}
+                    {currentQueue.queueNumber.split("-").pop()}
                   </div>
-                  <div className="flex-grow">
+                  <div className="grow">
                     <Title level={4} className="m-0">
                       {currentQueue.patientName}
                     </Title>
@@ -253,7 +256,13 @@ export default function StaffDashboard() {
                       </Text>
                       {currentQueue.checkInTime && (
                         <Text className="text-xs">
-                          Check-in: {new Date(currentQueue.checkInTime).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                          Check-in:{" "}
+                          {new Date(
+                            currentQueue.checkInTime
+                          ).toLocaleTimeString("id-ID", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
                         </Text>
                       )}
                     </div>
@@ -291,7 +300,9 @@ export default function StaffDashboard() {
                   onClick={handleStartQueue}
                   disabled={queueList.length === 0}
                 >
-                  {queueList.length > 0 ? `Mulai Pengerjaan: ${queueList[0].patientName}` : "Tidak Ada Antrian"}
+                  {queueList.length > 0
+                    ? `Mulai Pengerjaan: ${queueList[0].patientName}`
+                    : "Tidak Ada Antrian"}
                 </Button>
               </div>
             )}
@@ -332,7 +343,7 @@ export default function StaffDashboard() {
                   TOTAL SERVING (HARI INI)
                 </Text>
                 <Text className="text-xs block text-white opacity-90 mb-2">
-                  {totalServeResponse?.service || 'Semua Layanan'}
+                  {totalServeResponse?.service || "Semua Layanan"}
                 </Text>
                 <Title level={1} className="m-0 text-white">
                   {totalServeResponse?.total_completed_services ?? 0}
@@ -356,7 +367,9 @@ export default function StaffDashboard() {
               <div className="space-y-2">
                 <div className="bg-white p-3 rounded border border-gray-200 flex items-center gap-2">
                   <ClockCircleOutlined className="text-blue-500" />
-                  <Text className="text-sm">Waktu Istirahat: 12:00 - 13:00</Text>
+                  <Text className="text-sm">
+                    Waktu Istirahat: 12:00 - 13:00
+                  </Text>
                 </div>
                 <div className="bg-white p-3 rounded border border-gray-200 flex items-center gap-2">
                   <ClockCircleOutlined className="text-blue-500" />
@@ -372,9 +385,10 @@ export default function StaffDashboard() {
               </div>
             </Card>
             {activeService && (
-              <HistoryQueueList 
-                  serviceId={activeService.id} 
-                  queueDate={todayDate}/>
+              <HistoryQueueList
+                serviceId={activeService.id}
+                queueDate={todayDate}
+              />
             )}
           </div>
         </div>
