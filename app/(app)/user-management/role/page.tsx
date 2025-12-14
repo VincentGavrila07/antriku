@@ -1,6 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/app/languange-context";
+import type { Translations } from "@/app/languange-context";
 import { Spin, notification, Button } from "antd";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -8,7 +9,7 @@ import { useRouter } from "next/navigation";
 import Breadcrumbs from "@/app/components/breadcrumbs";
 import { usePermission } from "@/app/context/permission-context";
 import { PlusOutlined } from "@ant-design/icons";
-import Swal from "sweetalert2";  
+import Swal from "sweetalert2";
 import { Role, RoleResponsePagination } from "@/types/Role";
 import RoleService from "@/services/RoleService";
 import TableRole from "@/app/Tables/table-role";
@@ -16,23 +17,26 @@ import TableRole from "@/app/Tables/table-role";
 export default function RoleManagementPage() {
   const router = useRouter();
   const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["userManagement"] | undefined =
+    translations?.userManagement;
   const { permissions, loading: permissionLoading } = usePermission();
-
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-    const { data: roles, isLoading, error:roleError , refetch } =
-    useQuery<RoleResponsePagination<Role[]>, Error>({
-        queryKey: ["roles", page, pageSize],
-        queryFn: () =>
-        RoleService.getAllRolePagination({
-            page,
-            pageSize,
-            
-        }),
-        enabled: permissions.includes("view-user-management"),
-    });
-
+  const {
+    data: roles,
+    isLoading,
+    error: roleError,
+    refetch,
+  } = useQuery<RoleResponsePagination<Role[]>, Error>({
+    queryKey: ["roles", page, pageSize],
+    queryFn: () =>
+      RoleService.getAllRolePagination({
+        page,
+        pageSize,
+      }),
+    enabled: permissions.includes("view-user-management"),
+  });
 
   useEffect(() => {
     if (!permissionLoading && !permissions.includes("view-user-management")) {
@@ -40,7 +44,7 @@ export default function RoleManagementPage() {
     }
   }, [permissions, permissionLoading, router]);
 
-  if (langLoading || permissionLoading || !translations) {
+  if (langLoading || permissionLoading || !t) {
     return (
       <div className="flex justify-center items-center h-40">
         <Spin />
@@ -48,44 +52,37 @@ export default function RoleManagementPage() {
     );
   }
 
-    if (roleError) {
-      notification.error({
-        title: "Gagal Memuat Data User",
-        description: "Terjadi kesalahan dalam memuat data user",
-      });
-    }
-
-
-  const t = translations.Sidebar;
+  if (roleError) {
+    notification.error({
+      title: t.ErrorLoadRole,
+      description: t.ErrorLoadRoleDesc,
+    });
+  }
 
   const handleDeleteRole = async (roleId: string) => {
-    console.log("Attempting to delete Role:", roleId); 
     try {
       await RoleService.deleteRole(roleId, localStorage.getItem("token") || "");
-
       refetch();
-
-      notification.success({ title: "Role berhasil dihapus" });
+      notification.success({ title: t.SuccessDeleteRole });
     } catch (error) {
-      console.error("Delete failed:", error);  
       notification.error({
-        title: "Gagal Menghapus role",
-        description: "Terjadi kesalahan saat menghapus role",
+        title: t.ErrorDeleteRole,
+        description: t.ErrorDeleteRoleDesc,
       });
     }
   };
 
-  const handleDeleteConfirmation = (userId: string) => {
+  const handleDeleteConfirmation = (roleId: string) => {
     Swal.fire({
-      title: "Konfirmasi Hapus User",
-      text: "Apakah Anda yakin ingin menghapus role ini?",
+      title: t.DeleteRoleConfirmTitle,
+      text: t.DeleteRoleConfirmText,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Hapus",
-      cancelButtonText: "Batal",
+      confirmButtonText: t.DeleteRoleConfirmOk,
+      cancelButtonText: t.DeleteRoleConfirmCancel,
     }).then((result) => {
       if (result.isConfirmed) {
-        handleDeleteRole(userId);
+        handleDeleteRole(roleId);
       }
     });
   };
@@ -93,10 +90,10 @@ export default function RoleManagementPage() {
   return (
     <div>
       <Breadcrumbs
-        items={[{ label: "Role", href: "/admin/user-management/role" }]}
+        items={[{ label: t.RoleName, href: "/admin/user-management/role" }]}
       />
 
-      <h2 className="text-3xl font-semibold mb-4 mt-5">List Role</h2>
+      <h2 className="text-3xl font-semibold mb-4 mt-5">{t.ListRole}</h2>
 
       <div className="flex justify-end items-center mt-4 mb-6 gap-5">
         <Button
@@ -106,7 +103,7 @@ export default function RoleManagementPage() {
             router.push("/user-management/role/add");
           }}
         >
-          Add Role
+          {t.AddRole}
         </Button>
       </div>
 
@@ -120,7 +117,7 @@ export default function RoleManagementPage() {
           setPage(newPage);
           if (newPageSize) setPageSize(newPageSize);
         }}
-        onDelete={handleDeleteConfirmation} 
+        onDelete={handleDeleteConfirmation}
       />
     </div>
   );

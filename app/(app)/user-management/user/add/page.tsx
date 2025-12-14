@@ -1,6 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/app/languange-context";
+import type { Translations } from "@/app/languange-context";
 import { Spin, Form, Input, Button, Select, notification } from "antd";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -15,6 +16,7 @@ import { Role } from "@/types/Role";
 export default function AddUserPage() {
   const router = useRouter();
   const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["userManagement"] | undefined = translations?.userManagement;
   const { permissions, loading: permissionLoading } = usePermission();
 
   const [form] = Form.useForm();
@@ -40,8 +42,8 @@ export default function AddUserPage() {
       } catch (error) {
         console.error("Error fetching roles:", error);
         notification.error({
-          title: "Gagal memuat roles",
-          description: "Terjadi kesalahan saat memuat data roles.",
+          title: t?.ErrorLoadRole,
+          description: t?.ErrorLoadRoleDesc,
         });
       }
     };
@@ -50,18 +52,17 @@ export default function AddUserPage() {
 
   const handleFormSubmit = async (values: AddUserFormValues) => {
     setIsSubmitting(true);
-
     try {
-      const token = localStorage.getItem("token") || ""; 
-      await UserService.createUser(values, token); 
+      const token = localStorage.getItem("token") || "";
+      await UserService.createUser(values, token);
       notification.success({
-        title: "User berhasil ditambahkan",
+        title: t?.SuccessAddUser,
       });
-      router.push("/user-management/user"); 
+      router.push("/user-management/user");
     } catch (error) {
       notification.error({
-        title: "Gagal menambahkan user",
-        description: "Terjadi kesalahan saat menambahkan user.",
+        title: t?.ErrorAddUser,
+        description: t?.ErrorAddUserDesc,
       });
     } finally {
       setIsSubmitting(false);
@@ -69,7 +70,7 @@ export default function AddUserPage() {
   };
 
   
-  if (langLoading || permissionLoading || !translations || roles.length === 0) {
+  if (langLoading || permissionLoading || !t || roles.length === 0) {
     return (
       <div className="flex justify-center items-center h-40">
         <Spin />
@@ -80,15 +81,14 @@ export default function AddUserPage() {
   return (
     <div>
 
-        <Breadcrumbs
-          items={[
-            { label: "User", href: "/user-management/user" },
-            { label: "Tambah User", href: "/admin/user-management/user/add" },
-          ]}
-        />
+      <Breadcrumbs
+        items={[
+          { label: t.ListUser, href: "/user-management/user" },
+          { label: t.AddUser, href: "/admin/user-management/user/add" },
+        ]}
+      />
 
-
-      <h2 className="text-3xl font-semibold mb-4 mt-5">Tambah User</h2>
+      <h2 className="text-3xl font-semibold mb-4 mt-5">{t.AddUser}</h2>
 
       <Form
         form={form}
@@ -100,31 +100,31 @@ export default function AddUserPage() {
         className="space-y-6"
       >
         <Form.Item
-          label="Nama"
+          label={t.UserName}
           name="name"
-          rules={[{ required: true, message: "Nama user harus diisi" }]}
+          rules={[{ required: true, message: t.UserName + " " + t.UserPasswordRequired }]}
         >
-          <Input placeholder="Masukkan nama user" />
+          <Input placeholder={t.UserName} />
         </Form.Item>
 
         <Form.Item
-          label="Email"
+          label={t.UserEmail}
           name="email"
           rules={[
-            { required: true, message: "Email user harus diisi" },
-            { type: "email", message: "Format email tidak valid" },
+            { required: true, message: t.UserEmail + " " + t.UserPasswordRequired },
+            { type: "email", message: t.ErrorAddUserDesc },
           ]}
         >
-          <Input placeholder="Masukkan email user" />
+          <Input placeholder={t.UserEmail} />
         </Form.Item>
 
         <Form.Item
-          label="Role"
+          label={t.UserRole}
           name="roleId"
-          rules={[{ required: true, message: "Pilih role user" }]}
+          rules={[{ required: true, message: t.UserRole + " " + t.UserPasswordRequired }]}
         >
           <Select
-            placeholder="Pilih role user"
+            placeholder={t.UserRole}
             options={roles.map((role) => ({
               value: role.id,
               label: role.name,
@@ -139,7 +139,7 @@ export default function AddUserPage() {
             icon={<SaveOutlined />}
             loading={isSubmitting}
           >
-            Save
+            {t.Save}
           </Button>
         </Form.Item>
       </Form>

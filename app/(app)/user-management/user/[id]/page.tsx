@@ -1,6 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/app/languange-context";
+import type { Translations } from "@/app/languange-context";
 import { Spin, Form, Input, Button } from "antd";
 import {  useEffect } from "react";
 import { useQuery } from "@tanstack/react-query"; 
@@ -15,17 +16,25 @@ export default function UserDetailPage() {
   const router = useRouter();
   const params = useParams();
   const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["userManagement"] | undefined =
+    translations?.userManagement;
   const { permissions, loading: permissionLoading } = usePermission();
 
   const id = params?.id as string;
 
-
-  const {data : userData, isLoading, error } = useQuery<User>({
-    queryKey: ["user", id],  
-    queryFn: () => UserService.getUserById(id as string, localStorage.getItem("token") || ""),
+  const {
+    data: userData,
+    isLoading,
+    error,
+  } = useQuery<User>({
+    queryKey: ["user", id],
+    queryFn: () =>
+      UserService.getUserById(
+        id as string,
+        localStorage.getItem("token") || ""
+      ),
     enabled: !!id && permissions.includes("view-user-management"),
   });
-
 
   useEffect(() => {
     if (!permissionLoading && !permissions.includes("view-user-management")) {
@@ -33,7 +42,7 @@ export default function UserDetailPage() {
     }
   }, [permissions, permissionLoading, router]);
 
-  if (langLoading || permissionLoading || !translations) {
+  if (langLoading || permissionLoading || !t) {
     return (
       <div className="flex justify-center items-center h-40">
         <Spin />
@@ -53,9 +62,9 @@ export default function UserDetailPage() {
     return (
       <div>
         <Breadcrumbs
-          items={[{ label: "User", href: "/admin/user-management/user" }]}
+          items={[{ label: t.ListUser, href: "/admin/user-management/user" }]}
         />
-        <h1>Error loading user details</h1>
+        <h1>{t.ErrorLoadUser}</h1>
       </div>
     );
   }
@@ -63,27 +72,24 @@ export default function UserDetailPage() {
   return (
     <div className="p-4">
       <Breadcrumbs
-        items={[{ label: "User", href: "/admin/user-management/user" }]}
+        items={[{ label: t.ListUser, href: "/admin/user-management/user" }]}
       />
 
-      <h2 className="text-2xl font-semibold mb-4">Detail User</h2>
+      <h2 className="text-2xl font-semibold mb-4">{t.UserDetail}</h2>
 
       <Form layout="vertical" initialValues={userData} className="space-y-4">
-        <Form.Item label="ID" name="id">
+        <Form.Item label={t.UserId} name="id">
           <Input readOnly />
         </Form.Item>
-        
-        <Form.Item label="Nama" name="name">
+        <Form.Item label={t.UserName} name="name">
           <Input readOnly />
         </Form.Item>
-        
-        <Form.Item label="Email" name="email">
+        <Form.Item label={t.UserEmail} name="email">
           <Input readOnly />
         </Form.Item>
-
-        <Form.Item label="Role" name="roleName">
+        <Form.Item label={t.UserRole} name="roleName">
           <Input readOnly />
-        </Form.Item>        
+        </Form.Item>
       </Form>
     </div>
   );

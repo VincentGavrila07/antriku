@@ -7,11 +7,24 @@ import PermissionService from "@/services/PermissionService";
 import RoleService from "@/services/RoleService";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Role } from "@/types/Role";
+import { useLanguage } from "@/app/languange-context";
+
+import type { Translations } from "@/app/languange-context";
 
 export default function EditPermissionPage() {
   const params = useParams();
   const id = params?.id as string;
   const router = useRouter();
+  const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["userManagement"] | undefined = translations?.userManagement;
+
+  if (langLoading || !t) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
 
@@ -22,7 +35,7 @@ export default function EditPermissionPage() {
 
   const { data: allRoles, isLoading: loadingRoles } = useQuery<Role[]>({
     queryKey: ["all-roles"],
-    queryFn: () => RoleService.getAllRole().then(res => res.data),
+    queryFn: () => RoleService.getAllRole().then((res) => res.data),
   });
 
   const { data: assignedRoles, isLoading: loadingAssigned } = useQuery<Role[]>({
@@ -32,37 +45,32 @@ export default function EditPermissionPage() {
 
   useEffect(() => {
     if (assignedRoles && selectedRoles.length === 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedRoles(
-        assignedRoles.map(role => role.id.toString()) 
-      );
+      setSelectedRoles(assignedRoles.map((role) => role.id.toString()));
     }
   }, [assignedRoles, selectedRoles]);
-
 
   const updateMutation = useMutation({
     mutationFn: () =>
       PermissionService.updatePermissionRoles(
         id as string,
-        selectedRoles.map(Number) 
+        selectedRoles.map(Number)
       ),
     onSuccess: () => {
       notification.success({
-        title: "Berhasil Update Permission",
-        description: "Role untuk permission ini berhasil diperbarui",
+        title: t.SuccessUpdate,
+        description: t.SuccessUpdateDesc,
       });
       router.push("/user-management/permission");
     },
     onError: () => {
       notification.error({
-        title: "Gagal Update Permission",
-        description: "Terjadi kesalahan saat menyimpan data",
+        title: t.ErrorUpdate,
+        description: t.ErrorUpdateDesc,
       });
     },
   });
 
-
-  if (loadingDetail || loadingRoles || loadingAssigned) {
+  if (langLoading || loadingDetail || loadingRoles || loadingAssigned) {
     return (
       <div className="flex justify-center items-center h-40">
         <Spin size="large" />
@@ -73,17 +81,21 @@ export default function EditPermissionPage() {
   return (
     <div className="p-5">
       <h1 className="text-2xl font-bold mb-5">
-        Edit Permission: {permissionDetail?.name}
+        {t.EditPermission}: {permissionDetail?.name}
       </h1>
 
       {/* Info Permission */}
-      <Card title="Permission Info" className="mb-4">
-        <p><strong>Name:</strong> {permissionDetail?.name}</p>
-        <p><strong>Slug:</strong> {permissionDetail?.slug}</p>
+      <Card title={t.PermissionInfo} className="mb-4">
+        <p>
+          <strong>{t.Name}:</strong> {permissionDetail?.name}
+        </p>
+        <p>
+          <strong>{t.Slug}:</strong> {permissionDetail?.slug}
+        </p>
       </Card>
 
       {/* Multi-Select Roles */}
-      <Card title="Assign Roles (Multi-Select)">
+      <Card title={t.AssignRoles}>
         <Checkbox.Group
           value={selectedRoles}
           onChange={(values) => setSelectedRoles(values as string[])}
@@ -103,7 +115,7 @@ export default function EditPermissionPage() {
           loading={updateMutation.isPending}
           onClick={() => updateMutation.mutate()}
         >
-          Simpan
+          {t.Save}
         </Button>
       </Card>
     </div>
