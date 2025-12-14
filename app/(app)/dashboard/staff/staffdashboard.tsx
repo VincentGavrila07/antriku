@@ -332,22 +332,23 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
               )}
             </div>
           </div>
-
-          {/* Sidebar (Right Column) */}
-          <div className="bg-gray-100 p-6 md:h-screen md:sticky md:top-0">
-            {/* Total Serving Card (menggantikan Total Pasien Card) */}
-            <div className="bg-teal-500 text-white rounded-lg p-8 mb-6 text-center shadow-md">
-              <CalendarOutlined className="text-6xl opacity-75" />
+          <div className="bg-gray-100 p-6 lg:h-screen lg:sticky lg:top-0 h-auto w-full">
+            <div className="bg-teal-500 text-white rounded-lg p-6 mb-6 text-center shadow-md">
+              <CalendarOutlined className="text-5xl opacity-75" />{" "}
               <div className="mt-4">
-                <Text strong className="text-sm block text-white opacity-90">
-                  TOTAL SERVING (HARI INI)
+                <Text
+                  strong
+                  className="text-xs uppercase tracking-wider block text-white opacity-90"
+                >
+                  Total Serving (Hari Ini)
                 </Text>
-                <Text className="text-xs block text-white opacity-90 mb-2">
+                <Text className="text-[10px] block text-white opacity-90 mb-1">
                   {totalServeResponse?.service || "Semua Layanan"}
                 </Text>
-                <Title level={1} className="m-0 text-white">
+                <Title level={2} className="m-0 text-white font-bold">
+                  {" "}
+                  {/* Level 1 kegedean buat sidebar */}
                   {totalServeResponse?.total_completed_services ?? 0}
-                  {/* Angka / 6 dihapus karena total kapasitas harian tidak disediakan */}
                 </Title>
               </div>
             </div>
@@ -356,39 +357,58 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
             <Card
               title={
                 <div className="flex justify-between items-center">
-                  <Text strong>NOTES</Text>
-                  <Text className="text-sm text-gray-500">2/5</Text>
+                  <Text strong className="text-xs">
+                    NOTES
+                  </Text>
+                  <Text className="text-xs text-gray-500">2/5</Text>
                 </div>
               }
               size="small"
-              className="shadow-sm"
-              extra={<PlusOutlined className="cursor-pointer" />}
+              className="shadow-sm mb-6" // Kasih margin bottom biar ga nempel sama elemen bawahnya pas di mobile
+              extra={<PlusOutlined className="cursor-pointer text-xs" />}
+              styles={{ body: { padding: "12px" } }} // Padding dalem dikecilin dikit biar muat
             >
-              <div className="space-y-2">
-                <div className="bg-white p-3 rounded border border-gray-200 flex items-center gap-2">
-                  <ClockCircleOutlined className="text-blue-500" />
-                  <Text className="text-sm">
-                    Waktu Istirahat: 12:00 - 13:00
-                  </Text>
+              <div className="space-y-3">
+                <div className="bg-white p-2.5 rounded border border-gray-200 flex items-start gap-2">
+                  <ClockCircleOutlined className="text-blue-500 mt-0.5 text-xs" />
+                  <div className="flex flex-col">
+                    <Text className="text-xs font-bold text-gray-600">
+                      Istirahat
+                    </Text>
+                    <Text className="text-xs text-gray-500">12:00 - 13:00</Text>
+                  </div>
                 </div>
-                <div className="bg-white p-3 rounded border border-gray-200 flex items-center gap-2">
-                  <ClockCircleOutlined className="text-blue-500" />
-                  <Text className="text-sm">Rapat Bulanan: Jumat, 16:00</Text>
+
+                <div className="bg-white p-2.5 rounded border border-gray-200 flex items-start gap-2">
+                  <ClockCircleOutlined className="text-blue-500 mt-0.5 text-xs" />
+                  <div className="flex flex-col">
+                    <Text className="text-xs font-bold text-gray-600">
+                      Rapat Bulanan
+                    </Text>
+                    <Text className="text-xs text-gray-500">Jumat, 16:00</Text>
+                  </div>
                 </div>
-                <div className="mt-4">
+
+                <div className="mt-2">
                   <input
                     type="text"
                     placeholder="Note baru..."
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full p-2 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
               </div>
             </Card>
+
+            {/* History Queue List */}
             {activeService && (
-              <HistoryQueueList
-                serviceId={activeService.id}
-                queueDate={todayDate}
-              />
+              <div className="mt-6">
+                {" "}
+                {/* Bungkus history biar rapi */}
+                <HistoryQueueList
+                  serviceId={activeService.id}
+                  queueDate={todayDate}
+                />
+              </div>
             )}
           </div>
         </div>

@@ -77,7 +77,7 @@ export default function LandingPage() {
       <Navbar />
 
       {/* 2. HERO SECTION */}
-      <section className="relative bg-gradient-to-b from-blue-50 to-white pt-24 pb-32 overflow-hidden px-6">
+      <section className="relative bg-linear-to-b from-blue-50 to-white pt-24 pb-32 overflow-hidden px-6">
         <div className="container mx-auto text-center relative z-10">
           <div className="max-w-4xl mx-auto">
             {/* Tagline */}
@@ -98,6 +98,7 @@ export default function LandingPage() {
               {/* Tombol Login (Primary) */}
               <button
                 onClick={() => router.push("/login")}
+                // Ganti 'text-white' menjadi '!text-white'
                 className="group px-8 py-4 rounded-xl bg-blue-600 text-white font-bold text-lg shadow-lg shadow-blue-200 hover:bg-blue-700 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3"
               >
                 <LoginOutlined /> {t.ctaLogin}
@@ -116,7 +117,7 @@ export default function LandingPage() {
         </div>
 
         {/* Dekorasi Background */}
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -mt-20 w-[800px] h-[800px] bg-blue-100/50 rounded-full blur-3xl -z-0 pointer-events-none"></div>
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -mt-20 w-[800px] h-[800px] bg-blue-100/50 rounded-full blur-3xl z-0 pointer-events-none"></div>
       </section>
 
       {/* 3. FEATURES SECTION */}

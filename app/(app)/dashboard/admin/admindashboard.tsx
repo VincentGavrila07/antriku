@@ -15,7 +15,7 @@ import {
   Button,
   Progress,
   Table,
-  Input, // Import Input untuk Search
+  Input,
 } from "antd";
 import {
   UserOutlined,
@@ -28,7 +28,7 @@ import {
   DatabaseOutlined,
   StarFilled,
   ThunderboltOutlined,
-  SearchOutlined, // Import Icon Search
+  SearchOutlined,
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -72,10 +72,9 @@ const mockStats = {
   totalPatients: 1240,
   totalStaff: 18,
   todayQueues: 45,
-  activeServices: 6, // Update jumlah layanan
+  activeServices: 6,
 };
 
-// Data diperbanyak agar pagination terlihat (lebih dari 5)
 const serviceStatusData = [
   {
     key: "1",
@@ -164,7 +163,7 @@ interface AdminDashboardProps {
 
 export default function AdminDashboard({ user }: AdminDashboardProps) {
   const { translations, loading: langLoading } = useLanguage();
-  const [searchText, setSearchText] = useState(""); // State untuk search
+  const [searchText, setSearchText] = useState("");
 
   if (langLoading || !translations) {
     return (
@@ -174,7 +173,6 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
     );
   }
 
-  // --- LOGIC SEARCH / FILTER ---
   const filteredServiceStatus = serviceStatusData.filter((item) => {
     const search = searchText.toLowerCase();
     return (
@@ -226,7 +224,8 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
         {/* --- STATS ROW --- */}
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} lg={6}>
-            <Card className={CARD_STYLE} bodyStyle={{ padding: "20px" }}>
+            {/* FIX: Mengganti bodyStyle dengan styles.body */}
+            <Card className={CARD_STYLE} styles={{ body: { padding: "20px" } }}>
               <div className={`${ICON_BOX_STYLE} bg-blue-50 text-blue-600`}>
                 <TeamOutlined />
               </div>
@@ -237,7 +236,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
                   </span>
                 }
                 value={mockStats.totalPatients}
-                valueStyle={{ fontWeight: 800, color: "#1f2937" }}
+                styles={{ content: { fontWeight: 800, color: "#1f2937" } }}
               />
               <div className="mt-2 text-xs text-green-500 flex items-center gap-1 font-bold">
                 <ArrowUpOutlined /> +12% growth
@@ -245,7 +244,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card className={CARD_STYLE} bodyStyle={{ padding: "20px" }}>
+            <Card className={CARD_STYLE} styles={{ body: { padding: "20px" } }}>
               <div className={`${ICON_BOX_STYLE} bg-teal-50 text-teal-600`}>
                 <MedicineBoxOutlined />
               </div>
@@ -262,7 +261,8 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card className={CARD_STYLE} bodyStyle={{ padding: "20px" }}>
+            {/* FIX: Mengganti bodyStyle dengan styles.body */}
+            <Card className={CARD_STYLE} styles={{ body: { padding: "20px" } }}>
               <div className={`${ICON_BOX_STYLE} bg-orange-50 text-orange-600`}>
                 <NumberOutlined />
               </div>
@@ -281,7 +281,8 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card className={CARD_STYLE} bodyStyle={{ padding: "20px" }}>
+            {/* FIX: Mengganti bodyStyle dengan styles.body */}
+            <Card className={CARD_STYLE} styles={{ body: { padding: "20px" } }}>
               <div className={`${ICON_BOX_STYLE} bg-purple-50 text-purple-600`}>
                 <DatabaseOutlined />
               </div>
@@ -309,14 +310,13 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
         {/* --- MAIN CONTENT ROW --- */}
         <Row gutter={[24, 24]}>
           <Col xs={24} className="space-y-6">
-            {/* 1. STATUS LAYANAN (DENGAN SEARCH & PAGINATION) */}
+            {/* 1. STATUS LAYANAN */}
             <Card
               title={
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4">
                   <span className="font-bold text-lg text-gray-800">
                     Status Layanan & Antrian
                   </span>
-                  {/* Search Bar */}
                   <Input
                     placeholder="Cari Layanan atau Staff..."
                     prefix={<SearchOutlined className="text-gray-400" />}
@@ -329,12 +329,11 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
               className={CARD_STYLE}
             >
               <Table
-                dataSource={filteredServiceStatus} // Menggunakan data hasil filter
-                // Pagination Config: 5 baris per halaman
+                dataSource={filteredServiceStatus}
                 pagination={{
                   pageSize: 5,
                   position: ["bottomRight"],
-                  showSizeChanger: false, // Menyembunyikan opsi ganti jumlah baris
+                  showSizeChanger: false,
                 }}
                 rowClassName="hover:bg-gray-50 transition-colors"
                 scroll={{ x: 600 }}
