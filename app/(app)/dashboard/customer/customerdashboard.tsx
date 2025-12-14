@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { memo, useEffect, useState } from "react";
 import { useLanguage } from "@/app/languange-context";
 import {
   Spin,
@@ -19,8 +19,6 @@ import {
   RightOutlined,
   NotificationOutlined,
   UserOutlined,
-  HeartOutlined,
-  ExperimentOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import UserService from "@/services/UserService";
@@ -33,6 +31,34 @@ const { Title, Text } = Typography;
 // --- CONFIG CARD HEIGHT RESPONSIVE ---
 const CARD_HEIGHT_CLASS =
   "h-auto lg:h-[360px] shadow-sm hover:shadow-md transition-shadow duration-300 rounded-2xl border-none overflow-hidden flex flex-col";
+const RealtimeClock = memo(() => {
+  const [time, setTime] = useState("");
+
+  useEffect(() => {
+    const update = () =>
+      setTime(
+        new Date()
+          .toLocaleTimeString(undefined, {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false, 
+          })
+          .replace(/\./g, ":") 
+      );
+
+    update();
+    const timer = setInterval(update, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="flex items-center gap-2 mt-1">
+      <Text className="text-gray-500 font-mono font-bold">{time}</Text>
+    </div>
+  );
+});
+RealtimeClock.displayName = "RealtimeClock";
 
 export default function CustomerDashboard() {
   const { translations, loading: langLoading } = useLanguage();
@@ -79,7 +105,7 @@ export default function CustomerDashboard() {
     <div className="min-h-screen bg-gray-50 p-4 md:p-6 lg:p-10 font-sans pb-20">
       <div className="max-w-[1400px] mx-auto space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-2">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-2 border-b">
           <div>
             <Title
               level={3}
@@ -91,10 +117,8 @@ export default function CustomerDashboard() {
               Selamat datang kembali, {loggedInUser?.name || "Pasien"}
             </Text>
           </div>
-          <div className="hidden md:block text-right">
-            <Text type="secondary" className="text-xs">
-              Terakhir diupdate: Baru saja
-            </Text>
+          <div className="flex justify-between items-center px-6 py-4">
+            <RealtimeClock />
           </div>
         </div>
 
@@ -208,7 +232,7 @@ export default function CustomerDashboard() {
                 strong
                 className="text-gray-500 text-xs tracking-wider uppercase"
               >
-                PILIH LAYANAN
+                DAFTAR LAYANAN
               </Text>
             </div>
             <Card
@@ -230,23 +254,9 @@ export default function CustomerDashboard() {
                       <h4 className="font-bold text-gray-800 m-0 truncate text-sm md:text-base group-hover:text-blue-700">
                         {item.name}
                       </h4>
-                      {/* <Text type="secondary" className="text-xs block mt-0.5">
-                        {item.open || "-"}
-                      </Text> */}
                     </div>
-                    <RightOutlined className="text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-transform" />
                   </div>
                 ))}
-              </div>
-              <div className="mt-auto pt-4 border-t border-gray-50 bg-white z-10">
-                <Button
-                  block
-                  type="primary"
-                  size="large"
-                  className="bg-blue-600 hover:bg-blue-700 border-none h-10 md:h-11 font-semibold shadow-lg shadow-blue-200 rounded-xl flex items-center justify-center gap-2 text-sm md:text-base"
-                >
-                  Lihat Semua Layanan <RightOutlined className="text-xs" />
-                </Button>
               </div>
             </Card>
           </Col>

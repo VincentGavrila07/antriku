@@ -21,7 +21,7 @@ export default function Navbar() {
             Bahasa Tes
           </button>
         </div>
-      </div>
+      </div>  
     </nav>
   );
 }

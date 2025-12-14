@@ -6,6 +6,8 @@ import { useLogin } from "../hooks/useLogin";
 import { useRouter } from "next/navigation";
 import { GoogleOutlined } from "@ant-design/icons";
 import { usePermission } from "../context/permission-context";
+import ServiceService from "@/services/ServiceService";
+
 
 const { Title, Text } = Typography;
 
@@ -27,9 +29,18 @@ const LoginPage = () => {
       {
         onSuccess: async (data) => {
           localStorage.setItem("token", data.token);
-
-          await refreshPermissions();
           localStorage.setItem("user", JSON.stringify(data.user));
+          const userId = data.user.id;
+          try {
+            const myServiceRes = await ServiceService.getMyService(userId);
+            localStorage.setItem(
+              "myServices",
+              JSON.stringify(myServiceRes.data)
+            );
+          } catch (err) {
+            console.error("Gagal mengambil my service", err);
+          }
+          await refreshPermissions();
           router.push("/dashboard");
         },
         onError: (err: Error) => {

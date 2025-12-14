@@ -42,7 +42,7 @@ const RegisterPage = () => {
       {
         onSuccess: (data) => {
           localStorage.setItem("token", data.token);
-
+          localStorage.setItem("user", JSON.stringify(data.user));
           notification.success({
             title: "Registrasi Berhasil",
             description: `Selamat datang, ${data.user.name}`,

@@ -58,3 +58,11 @@ export interface UpdateUserFormValues {
   newPassword?: string;
   currentPassword?: string;
 }
+
+export type MyService = {
+  id: number;
+  name: string;
+  code: string;
+  description?: string;
+  estimated_time?: string;
+};
