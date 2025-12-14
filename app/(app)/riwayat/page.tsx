@@ -99,7 +99,7 @@ export default function ServiceHistoryPage() {
             setPage(1);
           }}
         >
-          <Option value="pending">Pending</Option>
+          <Option value="waiting">Waiting</Option>
           <Option value="completed">Completed</Option>
           <Option value="cancelled">Cancelled</Option>
         </Select>
