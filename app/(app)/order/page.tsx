@@ -56,7 +56,7 @@
       onError: () => {
         notification.error({
           title: "Booking Gagal",
-          description: "Terjadi kesalahan saat booking",
+          description: "Masih Ada Antrian Yang Aktif",
         });
       },
     });
