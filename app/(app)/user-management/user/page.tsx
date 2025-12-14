@@ -14,6 +14,8 @@ import { usePermission } from "@/app/context/permission-context";
 import { PlusOutlined } from "@ant-design/icons";
 import Swal from "sweetalert2";  
 
+import type { Translations } from "@/app/languange-context";
+
 export default function UserManagementPage() {
   const router = useRouter();
   const { translations, loading: langLoading } = useLanguage();
@@ -23,8 +25,15 @@ export default function UserManagementPage() {
   const [searchText, setSearchText] = useState("");
   const debouncedSearch = useDebounce(searchText, 1500);
 
+  const t: Translations["userManagement"] | undefined =
+    translations?.userManagement;
 
-  const { data: users, isLoading, error, refetch } = useQuery<UserResponsePagination<User[]>, Error>({
+  const {
+    data: users,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery<UserResponsePagination<User[]>, Error>({
     queryKey: ["users", page, pageSize, debouncedSearch],
     queryFn: () =>
       UserService.getAllUsers({
@@ -41,7 +50,7 @@ export default function UserManagementPage() {
     }
   }, [permissions, permissionLoading, router]);
 
-  if (langLoading || permissionLoading || !translations) {
+  if (langLoading || permissionLoading || !t) {
     return (
       <div className="flex justify-center items-center h-40">
         <Spin />
@@ -51,38 +60,32 @@ export default function UserManagementPage() {
 
   if (error) {
     notification.error({
-      title: "Gagal Memuat Data User",
-      description: "Terjadi kesalahan dalam memuat data user",
+      title: t.ErrorLoadUser,
+      description: t.ErrorLoadUserDesc,
     });
   }
 
-  const t = translations.userManagement;
-
   const handleDeleteUser = async (userId: string) => {
-    console.log("Attempting to delete user:", userId); 
     try {
       await UserService.deleteUser(userId, localStorage.getItem("token") || "");
-
       refetch();
-
-      notification.success({ title: "User berhasil dihapus" });
+      notification.success({ title: t.SuccessDeleteUser });
     } catch (error) {
-      console.error("Delete failed:", error);  
       notification.error({
-        title: "Gagal Menghapus User",
-        description: "Terjadi kesalahan saat menghapus user",
+        title: t.ErrorDeleteUser,
+        description: t.ErrorDeleteUserDesc,
       });
     }
   };
 
   const handleDeleteConfirmation = (userId: string) => {
     Swal.fire({
-      title: "Konfirmasi Hapus User",
-      text: "Apakah Anda yakin ingin menghapus user ini?",
+      title: t.DeleteUserConfirmTitle,
+      text: t.DeleteUserConfirmText,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Hapus",
-      cancelButtonText: "Batal",
+      confirmButtonText: t.DeleteUserConfirmOk,
+      cancelButtonText: t.DeleteUserConfirmCancel,
     }).then((result) => {
       if (result.isConfirmed) {
         handleDeleteUser(userId);
@@ -100,10 +103,10 @@ export default function UserManagementPage() {
 
       <div className="flex justify-end items-center mt-4 mb-6 gap-5">
         <Input
-          placeholder="Search by name..."
+          placeholder={t.SearchByName}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          className="w-80 max-w-xs mr-4" 
+          className="w-80 max-w-xs mr-4"
         />
         <Button
           type="primary"
@@ -112,7 +115,7 @@ export default function UserManagementPage() {
             router.push("/user-management/user/add");
           }}
         >
-          Add User
+          {t.AddUser}
         </Button>
       </div>
 
@@ -126,7 +129,7 @@ export default function UserManagementPage() {
           setPage(newPage);
           if (newPageSize) setPageSize(newPageSize);
         }}
-        onDelete={handleDeleteConfirmation} 
+        onDelete={handleDeleteConfirmation}
       />
     </div>
   );

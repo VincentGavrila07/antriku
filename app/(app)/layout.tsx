@@ -39,7 +39,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <div 
                 className="flex-1 flex flex-col bg-gray-50 h-screen overflow-y-auto scrollbar-hide"
             >
-                <header className="flex items-center justify-between p-6 bg-white shadow sticky top-0 z-10 flex-shrink-0">
+                <header className="flex items-center justify-between p-6 bg-white shadow sticky top-0 z-10 shrink-0">
                     <h1 className="text-xl font-semibold">Hello, {user?.name}</h1>
                     <span className="text-gray-500">{today}</span>
                 </header>

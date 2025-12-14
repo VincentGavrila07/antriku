@@ -1,6 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/app/languange-context";
+import type { Translations } from "@/app/languange-context";
 import { Spin, Form, Input, Button, notification } from "antd";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -13,6 +14,7 @@ import { AddRoleFormValues } from "@/types/Role";
 export default function AddRolePage() {
   const router = useRouter();
   const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["userManagement"] | undefined = translations?.userManagement;
   const { permissions, loading: permissionLoading } = usePermission();
 
   const [form] = Form.useForm();
@@ -24,31 +26,7 @@ export default function AddRolePage() {
     }
   }, [permissions, permissionLoading, router]);
 
-
-
-
-  const handleFormSubmit = async (values: AddRoleFormValues) => {
-    setIsSubmitting(true);
-
-    try {
-      const token = localStorage.getItem("token") || ""; 
-      await RoleService.createRole(values, token); 
-      notification.success({
-        title: "Role berhasil ditambahkan",
-      });
-      router.push("/user-management/role"); 
-    } catch (error) {
-      notification.error({
-        title: "Gagal menambahkan role",
-        description: "Terjadi kesalahan saat menambahkan role.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  
-  if (langLoading || permissionLoading || !translations) {
+  if (langLoading || permissionLoading || !t) {
     return (
       <div className="flex justify-center items-center h-40">
         <Spin />
@@ -56,18 +34,35 @@ export default function AddRolePage() {
     );
   }
 
+  const handleFormSubmit = async (values: AddRoleFormValues) => {
+    setIsSubmitting(true);
+    try {
+      const token = localStorage.getItem("token") || "";
+      await RoleService.createRole(values, token);
+      notification.success({
+        title: t.SuccessAddRole,
+      });
+      router.push("/user-management/role");
+    } catch (error) {
+      notification.error({
+        title: t.ErrorAddRole,
+        description: t.ErrorAddRoleDesc,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div>
+      <Breadcrumbs
+        items={[
+          { label: t.RoleName, href: "/user-management/role" },
+          { label: t.AddRole, href: "/admin/user-management/role/add" },
+        ]}
+      />
 
-        <Breadcrumbs
-          items={[
-            { label: "Role", href: "/user-management/role" },
-            { label: "Tambah Role", href: "/admin/user-management/role/add" },
-          ]}
-        />
-
-
-      <h2 className="text-3xl font-semibold mb-4 mt-5">Tambah Role</h2>
+      <h2 className="text-3xl font-semibold mb-4 mt-5">{t.AddRole}</h2>
 
       <Form
         form={form}
@@ -76,11 +71,11 @@ export default function AddRolePage() {
         className="space-y-6"
       >
         <Form.Item
-          label="Nama"
+          label={t.RoleName}
           name="name"
-          rules={[{ required: true, message: "Nama role harus diisi" }]}
+          rules={[{ required: true, message: t.RoleNameRequired }]}
         >
-          <Input placeholder="Masukkan nama role" />
+          <Input placeholder={t.RoleNamePlaceholder} />
         </Form.Item>
 
         <Form.Item className="flex justify-end">
@@ -90,7 +85,7 @@ export default function AddRolePage() {
             icon={<SaveOutlined />}
             loading={isSubmitting}
           >
-            Save
+            {t.Save}
           </Button>
         </Form.Item>
       </Form>

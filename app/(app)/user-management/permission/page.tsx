@@ -13,29 +13,37 @@ import PermissionService from "@/services/PermissionService";
 import TablePermission from "@/app/Tables/table-permission";
 import { PermissionListResponse } from "@/services/PermissionService";
 
+import type { Translations } from "@/app/languange-context";
+
 export default function PermissionManagementPage() {
   const router = useRouter();
   const { translations, loading: langLoading } = useLanguage();
   const { permissions, loading: permissionLoading } = usePermission();
-
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const t: Translations["userManagement"] | undefined =
+    translations?.userManagement;
 
-  const { data: permissionData, isLoading: permissionDataLoad, error: permissionError } =
-  useQuery<PermissionListResponse, Error>({
+  const {
+    data: permissionData,
+    isLoading: permissionDataLoad,
+    error: permissionError,
+  } = useQuery<PermissionListResponse, Error>({
     queryKey: ["permissions", page, pageSize],
     queryFn: () => PermissionService.getAllPermission(),
     enabled: permissions.includes("view-permission-management"),
   });
 
-
   useEffect(() => {
-    if (!permissionLoading && !permissions.includes("view-permission-management")) {
+    if (
+      !permissionLoading &&
+      !permissions.includes("view-permission-management")
+    ) {
       router.replace("/forbidden");
     }
   }, [permissions, permissionLoading, router]);
 
-  if (langLoading || permissionLoading || !translations) {
+  if (langLoading || permissionLoading || !t) {
     return (
       <div className="flex justify-center items-center h-40">
         <Spin />
@@ -43,31 +51,30 @@ export default function PermissionManagementPage() {
     );
   }
 
-    if (permissionError) {
-      notification.error({
-        title: "Gagal Memuat Data Permission",
-        description: "Terjadi kesalahan dalam memuat data permission",
-      });
-    }
-
-
-  const t = translations.Sidebar;
-
-  
+  if (permissionError) {
+    notification.error({
+      title: t.ErrorLoad,
+      description: t.ErrorLoadDesc,
+    });
+  }
 
   return (
     <div>
       <Breadcrumbs
-        items={[{ label: "Permission", href: "/admin/user-management/permission" }]}
+        items={[
+          {
+            label: t.PermissionInfo,
+            href: "/admin/user-management/permission",
+          },
+        ]}
       />
 
-      <h2 className="text-3xl font-semibold mb-4 mt-5">List Permission</h2>
-
+      <h2 className="text-3xl font-semibold mb-4 mt-5">{t.ListPermission}</h2>
 
       <TablePermission
         data={permissionData?.data ?? []}
         isLoading={permissionDataLoad}
-        />
+      />
     </div>
   );
 }

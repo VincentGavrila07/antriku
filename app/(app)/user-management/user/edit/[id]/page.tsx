@@ -1,6 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/app/languange-context";
+import type { Translations } from "@/app/languange-context";
 import { Spin, Form, Input, Button, Select, notification } from "antd";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -19,6 +20,7 @@ export default function EditUserPage() {
   const id = params?.id as string;
 
   const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["userManagement"] | undefined = translations?.userManagement;
   const { permissions, loading: permissionLoading } = usePermission();
 
   const [form] = Form.useForm();
@@ -57,8 +59,8 @@ export default function EditUserPage() {
       } catch (error) {
         console.error("Error fetching roles:", error);
         notification.error({
-          title: "Gagal memuat roles",
-          description: "Terjadi kesalahan saat memuat data roles.",
+          title: t?.ErrorLoadRole,
+          description: t?.ErrorLoadRoleDesc,
         });
       }
     };
@@ -83,14 +85,14 @@ export default function EditUserPage() {
       await UserService.updateUser(id as string, values, token);
 
       notification.success({
-        title: "User berhasil diperbarui",
+        title: t?.SuccessEditUser,
       });
 
       router.push("/user-management/user");
     } catch (error) {
       notification.error({
-        title: "Gagal memperbarui user",
-        description: "Terjadi kesalahan saat menyimpan perubahan.",
+        title: t?.ErrorEditUser,
+        description: t?.ErrorEditUserDesc,
       });
     } finally {
       setIsSubmitting(false);
@@ -101,7 +103,7 @@ export default function EditUserPage() {
     langLoading ||
     permissionLoading ||
     userLoading ||
-    !translations
+    !t
   ) {
     return (
       <div className="flex justify-center items-center h-40">
@@ -114,12 +116,12 @@ export default function EditUserPage() {
     <div>
       <Breadcrumbs
         items={[
-          { label: "User", href: "/user-management/user" },
-          { label: "Edit User", href: `/user-management/user/edit/${id}` },
+          { label: t.ListUser, href: "/user-management/user" },
+          { label: t.EditUser, href: `/user-management/user/edit/${id}` },
         ]}
       />
 
-      <h2 className="text-3xl font-semibold mb-4 mt-5">Edit User</h2>
+      <h2 className="text-3xl font-semibold mb-4 mt-5">{t.EditUser}</h2>
 
       <Form
         form={form}
@@ -128,20 +130,20 @@ export default function EditUserPage() {
         className="space-y-6"
       >
         <Form.Item
-          label="Nama"
+          label={t.UserName}
           name="name"
-          rules={[{ required: true, message: "Nama user harus diisi" }]}
+          rules={[{ required: true, message: t.UserName + " " + t.UserPasswordRequired }]}
         >
-          <Input placeholder="Masukkan nama user" />
+          <Input placeholder={t.UserName} />
         </Form.Item>
 
         <Form.Item
-          label="Role"
+          label={t.UserRole}
           name="roleId"
-          rules={[{ required: true, message: "Pilih role user" }]}
+          rules={[{ required: true, message: t.UserRole + " " + t.UserPasswordRequired }]}
         >
           <Select
-            placeholder="Pilih role user"
+            placeholder={t.UserRole}
             disabled={roles.length === 0}
             options={roles.map((role) => ({
               value: role.id,
@@ -157,7 +159,7 @@ export default function EditUserPage() {
             icon={<SaveOutlined />}
             loading={isSubmitting}
           >
-            Save
+            {t.Save}
           </Button>
         </Form.Item>
       </Form>

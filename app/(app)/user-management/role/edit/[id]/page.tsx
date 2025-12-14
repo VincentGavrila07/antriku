@@ -1,6 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/app/languange-context";
+import type { Translations } from "@/app/languange-context";
 import { Spin, Form, Input, Button, notification } from "antd";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -14,11 +15,10 @@ import { useQuery } from "@tanstack/react-query";
 export default function EditRolePage() {
   const router = useRouter();
   const params = useParams();
-  const id = params.id as string;
-
+  const id = params?.id as string;
   const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["userManagement"] | undefined = translations?.userManagement;
   const { permissions, loading: permissionLoading } = usePermission();
-
   const [form] = Form.useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -28,19 +28,12 @@ export default function EditRolePage() {
     }
   }, [permissions, permissionLoading, router]);
 
-  const {
-    data: roleData,
-    isLoading: roleLoading,
-  } = useQuery<Role>({
+  const { data: roleData, isLoading: roleLoading } = useQuery<Role>({
     queryKey: ["role", id],
     queryFn: () =>
-      RoleService.getRoleById(
-        id,
-        localStorage.getItem("token") || ""
-      ),
+      RoleService.getRoleById(id, localStorage.getItem("token") || ""),
     enabled: !!id && permissions.includes("view-user-management"),
   });
-
 
   useEffect(() => {
     if (roleData) {
@@ -52,33 +45,24 @@ export default function EditRolePage() {
 
   const handleFormSubmit = async (values: AddRoleFormValues) => {
     setIsSubmitting(true);
-
     try {
       const token = localStorage.getItem("token") || "";
-
       await RoleService.updateRole(id as string, values, token);
-
       notification.success({
-        title: "Role berhasil diperbarui",
+        title: t?.SuccessEditRole,
       });
-
       router.push("/user-management/role");
     } catch (error) {
       notification.error({
-        title: "Gagal memperbarui role",
-        description: "Terjadi kesalahan saat menyimpan perubahan.",
+        title: t?.ErrorEditRole,
+        description: t?.ErrorEditRoleDesc,
       });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (
-    langLoading ||
-    permissionLoading ||
-    roleLoading ||
-    !translations
-  ) {
+  if (langLoading || permissionLoading || roleLoading || !t) {
     return (
       <div className="flex justify-center items-center h-40">
         <Spin />
@@ -90,12 +74,12 @@ export default function EditRolePage() {
     <div>
       <Breadcrumbs
         items={[
-          { label: "Role", href: "/user-management/role" },
-          { label: "Edit Role", href: `/user-management/role/edit/${id}` },
+          { label: t.RoleName, href: "/user-management/role" },
+          { label: t.EditRole, href: `/user-management/role/edit/${id}` },
         ]}
       />
 
-      <h2 className="text-3xl font-semibold mb-4 mt-5">Edit Role</h2>
+      <h2 className="text-3xl font-semibold mb-4 mt-5">{t.EditRole}</h2>
 
       <Form
         form={form}
@@ -104,11 +88,11 @@ export default function EditRolePage() {
         className="space-y-6"
       >
         <Form.Item
-          label="Nama"
+          label={t.RoleName}
           name="name"
-          rules={[{ required: true, message: "Nama role harus diisi" }]}
+          rules={[{ required: true, message: t.RoleNameRequired }]}
         >
-          <Input placeholder="Masukkan nama role" />
+          <Input placeholder={t.RoleNamePlaceholder} />
         </Form.Item>
 
         <Form.Item className="flex justify-end">
@@ -118,7 +102,7 @@ export default function EditRolePage() {
             icon={<SaveOutlined />}
             loading={isSubmitting}
           >
-            Save
+            {t.Save}
           </Button>
         </Form.Item>
       </Form>

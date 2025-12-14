@@ -7,9 +7,9 @@ export interface Translations {
     appName: string;
     adminDashboard: string;
     userManagement: string;
-    user:string;
-    role:string;
-    permission:string;
+    user: string;
+    role: string;
+    permission: string;
     reports: string;
     service: string;
     staffDashboard: string;
@@ -26,8 +26,9 @@ export interface Translations {
     welcome:string;
   },
   userManagement: {
+    // General
     ListUser: string;
-  };
+    ListPermission: string;
   profile:{
     EditProfile:string;
     changePass:string;
@@ -57,7 +58,71 @@ export interface Translations {
       Save: string;
     };
   };
-  
+    ListRole: string;
+    EditPermission: string;
+    PermissionInfo: string;
+    Name: string;
+    Slug: string;
+    AssignRoles: string;
+    Save: string;
+    Loading: string;
+    Forbidden: string;
+    // Permission
+    SuccessUpdate: string;
+    SuccessUpdateDesc: string;
+    ErrorUpdate: string;
+    ErrorUpdateDesc: string;
+    ErrorLoad: string;
+    ErrorLoadDesc: string;
+    // Role management
+    EditRole: string;
+    AddRole: string;
+    RoleName: string;
+    RoleNameRequired: string;
+    RoleNamePlaceholder: string;
+    SuccessAddRole: string;
+    SuccessEditRole: string;
+    ErrorAddRole: string;
+    ErrorEditRole: string;
+    ErrorAddRoleDesc: string;
+    ErrorEditRoleDesc: string;
+    ErrorLoadRole: string;
+    ErrorLoadRoleDesc: string;
+    SuccessDeleteRole: string;
+    ErrorDeleteRole: string;
+    ErrorDeleteRoleDesc: string;
+    DeleteRoleConfirmTitle: string;
+    DeleteRoleConfirmText: string;
+    DeleteRoleConfirmOk: string;
+    DeleteRoleConfirmCancel: string;
+    // User detail
+    UserDetail: string;
+    AddUser: string;
+    EditUser: string;
+    UserId: string;
+    UserName: string;
+    UserEmail: string;
+    UserRole: string;
+    UserPassword: string;
+    UserPasswordPlaceholder: string;
+    UserPasswordRequired: string;
+    SuccessAddUser: string;
+    SuccessEditUser: string;
+    ErrorAddUser: string;
+    ErrorEditUser: string;
+    ErrorAddUserDesc: string;
+    ErrorEditUserDesc: string;
+    ErrorLoadUser: string;
+    ErrorLoadUserDesc: string;
+    SuccessDeleteUser: string;
+    ErrorDeleteUser: string;
+    ErrorDeleteUserDesc: string;
+    DeleteUserConfirmTitle: string;
+    DeleteUserConfirmText: string;
+    DeleteUserConfirmOk: string;
+    DeleteUserConfirmCancel: string;
+    SearchByName: string;
+  };
 }
 
 interface LanguageContextType {
