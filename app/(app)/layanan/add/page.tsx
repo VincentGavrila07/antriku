@@ -8,7 +8,6 @@ import {
   Button,
   Select,
   TimePicker,
-  Switch,
   notification,
 } from "antd";
 import { Moment } from "moment";
@@ -24,12 +23,12 @@ import { User } from "@/types/User";
 export default function AddServicePage() {
   const router = useRouter();
   const { translations, loading: langLoading } = useLanguage();
+  const t = translations?.service;
 
   const [form] = Form.useForm();
   const [users, setUsers] = useState<User[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  /* ================= LOAD STAFF (roleId = 3) ================= */
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -38,16 +37,10 @@ export default function AddServicePage() {
           pageSize: 100,
         });
 
-        // ✅ HANYA STAFF
-        const staffOnly = res.data.filter(
-          (user: User) => user.roleId === 3
-        );
-
-        setUsers(staffOnly);
-      } catch (error) {
-        console.error(error);
+        setUsers(res.data.filter((user: User) => user.roleId === 3));
+      } catch {
         notification.error({
-          title: "Gagal memuat data staff",
+          title: "Failed to load staff data",
         });
       }
     };
@@ -55,7 +48,6 @@ export default function AddServicePage() {
     fetchUsers();
   }, []);
 
-  /* ================= SUBMIT ================= */
   const handleFormSubmit = async (
     values: AddServiceFormValues & { estimated_time?: Moment | null }
   ) => {
@@ -64,31 +56,29 @@ export default function AddServicePage() {
     try {
       const payload: AddServiceFormValues = {
         ...values,
-        estimated_time:
-          values.estimated_time && values.estimated_time !== null
-            ? values.estimated_time.format("HH:mm:ss")
-            : undefined,
+        estimated_time: values.estimated_time
+          ? values.estimated_time.format("HH:mm:ss")
+          : undefined,
         assigned_user_ids: values.assigned_user_ids ?? [],
       };
 
-      await ServiceService.addService(payload as { name: string; description?: string | undefined; assigned_user_ids?: number[] | undefined; is_active?: boolean | undefined; estimated_time?: string | undefined });
+      await ServiceService.addService(payload);
 
       notification.success({
-        title: "Service berhasil ditambahkan",
+        title:"Service added successfully",
       });
 
-      router.push("/admin/layanan");
-    } catch (error) {
-      console.error(error);
+      router.push("/layanan");
+    } catch {
       notification.error({
-        title: "Gagal menambahkan service",
+        title:  "Failed to add service",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (langLoading || users.length === 0) {
+  if (langLoading || !translations) {
     return (
       <div className="flex justify-center items-center h-40">
         <Spin size="large" />
@@ -100,13 +90,13 @@ export default function AddServicePage() {
     <div>
       <Breadcrumbs
         items={[
-          { label: "Services", href: "/admin/layanan" },
-          { label: "Tambah Service", href: "/admin/layanan/add" },
+          { label: t?.page.ListService ?? "Services", href: "/layanan" },
+          { label: t?.page.AddLayanan ?? "Add Service", href: "/layanan/add" },
         ]}
       />
 
       <h2 className="text-3xl font-semibold mb-4 mt-5">
-        Tambah Service
+        {t?.page.AddLayanan}
       </h2>
 
       <Form
@@ -117,30 +107,46 @@ export default function AddServicePage() {
         className="space-y-6"
       >
         <Form.Item
-          label="Nama Service"
+          label={t?.AddService.Name}
           name="name"
-          rules={[{ required: true, message: "Nama service harus diisi" }]}
+          rules={[
+            {
+              required: true,
+              message: `${t?.AddService.Name} is required`,
+            },
+          ]}
         >
-          <Input placeholder="Masukkan nama service" />
+          <Input placeholder={t?.AddService.Name} />
         </Form.Item>
 
         <Form.Item
-          label="Kode Service"
+          label={t?.AddService.ServiceCode}
           name="code"
-          rules={[{ required: true, message: "Kode Service harus diisi" }]}
+          rules={[
+            {
+              required: true,
+              message: `${t?.AddService.ServiceCode} is required`,
+            },
+          ]}
         >
-          <Input placeholder="Masukkan kode service" />
+          <Input placeholder={t?.AddService.ServiceCode} />
         </Form.Item>
 
-        <Form.Item label="Deskripsi" name="description">
-          <Input.TextArea placeholder="Deskripsi service" />
+        <Form.Item
+          label={t?.AddService.Description}
+          name="description"
+        >
+          <Input.TextArea placeholder={t?.AddService.Description} />
         </Form.Item>
 
-        <Form.Item label="Assign Staff" name="assigned_user_ids">
+        <Form.Item
+          label={t?.AddService.AssignStaf}
+          name="assigned_user_ids"
+        >
           <Select
             mode="multiple"
             showSearch
-            placeholder="Pilih staff"
+            placeholder={t?.AddService.AssignStaf}
             optionFilterProp="label"
             filterOption={(input, option) =>
               (option?.label ?? "")
@@ -154,10 +160,12 @@ export default function AddServicePage() {
           />
         </Form.Item>
 
-        <Form.Item label="Estimasi Waktu" name="estimated_time">
+        <Form.Item
+          label={t?.AddService.EstimatedTime}
+          name="estimated_time"
+        >
           <TimePicker format="HH:mm:ss" />
         </Form.Item>
-
 
         <Form.Item className="flex justify-end">
           <Button
@@ -166,7 +174,7 @@ export default function AddServicePage() {
             icon={<SaveOutlined />}
             loading={isSubmitting}
           >
-            Save
+            {t?.AddService.Save}
           </Button>
         </Form.Item>
       </Form>

@@ -26,6 +26,8 @@ export default function EditProfilePage() {
     queryFn: () => UserService.getMe(token),
     enabled: !!token,
   });
+  
+  const t = translations?.profile;
 
   useEffect(() => {
     if (loggedInUser) {
@@ -90,7 +92,7 @@ export default function EditProfilePage() {
         items={[{ label: "My Profile", href: `/profile/${loggedInUser.id}` }]}
       />
 
-      <h2 className="text-3xl font-semibold mb-4 mt-5">Edit Profile</h2>
+      <h2 className="text-3xl font-semibold mb-4 mt-5">{t?.EditProfile}</h2>
 
       <Form
         form={form}
@@ -99,7 +101,7 @@ export default function EditProfilePage() {
         className="space-y-6"
       >
         <Form.Item
-          label="Nama"
+          label={t?.name}
           name="name"
           rules={[{ required: true, message: "Nama user harus diisi" }]}
         >
@@ -110,7 +112,7 @@ export default function EditProfilePage() {
         <Divider plain>Ganti Password (Opsional)</Divider>
 
         <Form.Item
-          label="Password Baru"
+          label={t?.NewPass}
           name="newPassword"
           rules={[{ min: 6, message: "Minimal 6 karakter" }]}
         >
@@ -118,7 +120,7 @@ export default function EditProfilePage() {
         </Form.Item>
 
         <Form.Item
-          label="Konfirmasi Password Saat Ini"
+          label={t?.ConfirmPass}
           name="currentPassword"
           dependencies={["newPassword"]}
           rules={[
@@ -144,7 +146,7 @@ export default function EditProfilePage() {
             icon={<SaveOutlined />}
             loading={isSubmitting}
           >
-            Save
+            {t?.Save}
           </Button>
         </Form.Item>
       </Form>

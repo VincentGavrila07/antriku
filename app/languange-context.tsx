@@ -18,11 +18,44 @@ export interface Translations {
     profile: string;
     logout: string;
   };
+  Forbidden:{
+    Forbidden:string;
+    Sorry:string;
+  },
   welcome:{
     welcome:string;
   },
   userManagement: {
     ListUser: string;
+  };
+  profile:{
+    EditProfile:string;
+    changePass:string;
+    name:string;
+    NewPass:string;
+    ConfirmPass:string;
+    Save:string;
+  },
+  report : {
+    GenerateServiceReport : string;
+    GenerateReport : string;
+    Keterangan:string;
+    OpenManually : string;
+  },
+  service: {
+    page: {
+      ListService: string;
+      AddLayanan: string;
+      EditService:string;
+    };
+    AddService: {
+      Name: string;
+      ServiceCode: string;
+      Description: string;
+      AssignStaf: string;
+      EstimatedTime: string;
+      Save: string;
+    };
   };
   
 }

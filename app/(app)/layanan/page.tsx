@@ -5,17 +5,16 @@ import { Spin, Input, notification, Button } from "antd";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import UserService from "@/services/UserService";
 import { useDebounce } from "@/app/utils/useDebounce";
 import Breadcrumbs from "@/app/components/breadcrumbs";
 import { usePermission } from "@/app/context/permission-context";
 import { PlusOutlined } from "@ant-design/icons";
-import Swal from "sweetalert2";  
+import Swal from "sweetalert2";
 import { Service, ServiceResponsePagination } from "@/types/Service";
 import ServiceService from "@/services/ServiceService";
 import TableService from "@/app/Tables/table-service";
 
-export default function SeriveManagementPage() {
+export default function ServiceManagementPage() {
   const router = useRouter();
   const { translations, loading: langLoading } = useLanguage();
   const { permissions, loading: permissionLoading } = usePermission();
@@ -25,8 +24,14 @@ export default function SeriveManagementPage() {
   const [searchText, setSearchText] = useState("");
   const debouncedSearch = useDebounce(searchText, 1500);
 
+  const t = translations?.service;
 
-  const { data: services, isLoading:loadingServices, error:errorServices, refetch } = useQuery<ServiceResponsePagination<Service[]>, Error>({
+  const {
+    data: services,
+    isLoading: loadingServices,
+    error: errorServices,
+    refetch,
+  } = useQuery<ServiceResponsePagination<Service[]>, Error>({
     queryKey: ["services", page, pageSize, debouncedSearch],
     queryFn: () =>
       ServiceService.getAllService({
@@ -43,6 +48,15 @@ export default function SeriveManagementPage() {
     }
   }, [permissions, permissionLoading, router]);
 
+  useEffect(() => {
+    if (errorServices) {
+      notification.error({
+        title: "Gagal Memuat Data Service",
+        description: "Terjadi kesalahan dalam memuat data service",
+      });
+    }
+  }, [errorServices]);
+
   if (langLoading || permissionLoading || !translations) {
     return (
       <div className="flex justify-center items-center h-40">
@@ -51,25 +65,15 @@ export default function SeriveManagementPage() {
     );
   }
 
-  if (errorServices) {
-    notification.error({
-      title: "Gagal Memuat Data Service",
-      description: "Terjadi kesalahan dalam memuat data service",
-    });
-  }
-
-  const t = translations.Sidebar;
-
-  const handleDeleteUser = async (userId: string) => {
-    console.log("Attempting to delete Service:", userId); 
+  const handleDeleteService = async (serviceId: string) => {
     try {
-      await ServiceService.deleteService(userId, localStorage.getItem("token") || "");
-
+      await ServiceService.deleteService(
+        serviceId,
+        localStorage.getItem("token") || ""
+      );
       refetch();
-
       notification.success({ title: "Service berhasil dihapus" });
-    } catch (error) {
-      console.error("Delete failed:", error);  
+    } catch {
       notification.error({
         title: "Gagal Menghapus Service",
         description: "Terjadi kesalahan saat menghapus Service",
@@ -77,7 +81,7 @@ export default function SeriveManagementPage() {
     }
   };
 
-  const handleDeleteConfirmation = (userId: string) => {
+  const handleDeleteConfirmation = (serviceId: string) => {
     Swal.fire({
       title: "Konfirmasi Hapus Service",
       text: "Apakah Anda yakin ingin menghapus Service ini?",
@@ -87,7 +91,7 @@ export default function SeriveManagementPage() {
       cancelButtonText: "Batal",
     }).then((result) => {
       if (result.isConfirmed) {
-        handleDeleteUser(userId);
+        handleDeleteService(serviceId);
       }
     });
   };
@@ -95,26 +99,31 @@ export default function SeriveManagementPage() {
   return (
     <div>
       <Breadcrumbs
-        items={[{ label: "User", href: "/admin/user-management/user" }]}
+        items={[
+          {
+            label: t?.page.ListService || "List Service",
+            href: "/layanan",
+          },
+        ]}
       />
 
-      <h2 className="text-3xl font-semibold mb-4 mt-5">List Service</h2>
+      <h2 className="text-3xl font-semibold mb-4 mt-5">
+        {t?.page.ListService}
+      </h2>
 
       <div className="flex justify-end items-center mt-4 mb-6 gap-5">
         <Input
           placeholder="Search by name..."
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          className="w-80 max-w-xs mr-4" 
+          className="w-80 max-w-xs"
         />
         <Button
           type="primary"
           icon={<PlusOutlined />}
-          onClick={() => {
-            router.push("/layanan/add");
-          }}
+          onClick={() => router.push("/layanan/add")}
         >
-          Add Layanan
+          {t?.page.AddLayanan}
         </Button>
       </div>
 
@@ -128,7 +137,7 @@ export default function SeriveManagementPage() {
           setPage(newPage);
           if (newPageSize) setPageSize(newPageSize);
         }}
-        onDelete={handleDeleteConfirmation} 
+        onDelete={handleDeleteConfirmation}
       />
     </div>
   );
