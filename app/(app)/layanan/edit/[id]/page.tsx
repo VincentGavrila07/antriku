@@ -1,171 +1,253 @@
 "use client";
 
+import React, { useState, useEffect, memo } from "react";
+import { User } from "@/types/User";
+import { Service } from "@/types/Service";
 import { useLanguage } from "@/app/languange-context";
-import { Spin, Form, Input, Button, Select, TimePicker, Switch, notification } from "antd";
-import { Moment } from "moment";
-import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
-import Breadcrumbs from "@/app/components/breadcrumbs";
-import ServiceService from "@/services/ServiceService";
+import {
+  Spin,
+  Card,
+  Typography,
+  Row,
+  Col,
+  Statistic,
+  Avatar,
+  Tag,
+  Table,
+  Input,
+} from "antd";
+import {
+  TeamOutlined,
+  MedicineBoxOutlined,
+  NumberOutlined,
+  ClockCircleOutlined,
+  SettingOutlined,
+  DatabaseOutlined,
+  SearchOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+
 import UserService from "@/services/UserService";
-import { SaveOutlined } from "@ant-design/icons";
-import { AddServiceFormValues, Service } from "@/types/Service";
-import moment from "moment";
+import ServiceService from "@/services/ServiceService";
 
-export default function EditServicePage() {
-  const router = useRouter();
-  const params = useParams();
-  const id = params?.id as string;
+const { Title, Text } = Typography;
 
-  const { translations, loading: langLoading } = useLanguage();
-  const [form] = Form.useForm();
-  const [users, setUsers] = useState<{ id: number; name: string }[]>([]);
-  const [service, setService] = useState<Service | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+/* ================= JAM REALTIME ================= */
+const RealtimeClock = memo(() => {
+  const [time, setTime] = useState("");
 
-  // Load staff/users
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await UserService.getAllUsers({});
-        setUsers(res.data || []);
-      } catch (error) {
-        console.error(error);
-        notification.error({ title: "Gagal memuat data user" });
-      }
-    };
-    fetchUsers();
+    const updateTime = () =>
+      setTime(
+        new Date().toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        })
+      );
+
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
   }, []);
 
-  // Load service data
+  return (
+    <div className="flex items-center gap-2">
+      <ClockCircleOutlined className="text-gray-400" />
+      <Text className="font-mono font-bold text-gray-600">{time}</Text>
+    </div>
+  );
+});
+RealtimeClock.displayName = "RealtimeClock";
+
+interface AdminDashboardProps {
+  user: User;
+}
+
+export default function AdminDashboard({ user }: AdminDashboardProps) {
+  const { translations, loading: langLoading } = useLanguage();
+  const [searchText, setSearchText] = useState("");
+
+  const [totalPatients, setTotalPatients] = useState(0);
+  const [totalStaff, setTotalStaff] = useState(0);
+  const [todayQueues, setTodayQueues] = useState(0);
+  const [activeServices, setActiveServices] = useState(0);
+  const [loadingStats, setLoadingStats] = useState(true);
+
+  const [services, setServices] = useState<Service[]>([]);
+  const [tableLoading, setTableLoading] = useState(false);
+
+  const [staffMap, setStaffMap] = useState<Record<number, string>>({});
+
   useEffect(() => {
-    const fetchService = async () => {
+    const fetchDashboard = async () => {
       try {
-        const res = await ServiceService.getServiceById(id);
-        setService(res.data);
-      } catch (error) {
-        console.error(error);
-        notification.error({ title: "Gagal memuat data service" });
+        setLoadingStats(true);
+        setTableLoading(true);
+
+        const patientRes = await UserService.getTotalUserByRole(2);
+        const staffRes = await UserService.getTotalUserByRole(3);
+
+        const staffList = await UserService.getAllUsers({
+          page: 1,
+          pageSize: 1000,
+          filters: { roleId: 3 },
+        });
+
+        const map: Record<number, string> = {};
+        staffList.data.forEach((u: User) => (map[u.id] = u.name));
+        setStaffMap(map);
+
+        const serviceRes = await ServiceService.getAllService({
+          page: 1,
+          pageSize: 100,
+        });
+
+        const today = new Date().toISOString().split("T")[0];
+        let todayServe = 0;
+        try {
+          const serveRes = await ServiceService.getTotalServe({ queue_date: today });
+          todayServe = serveRes.total_completed_services;
+        } catch {}
+
+        setTotalPatients(patientRes.total);
+        setTotalStaff(staffRes.total);
+        setActiveServices(serviceRes.total);
+        setTodayQueues(todayServe);
+        setServices(serviceRes.data);
+      } finally {
+        setLoadingStats(false);
+        setTableLoading(false);
       }
     };
-    fetchService();
-  }, [id]);
 
-  // Set form values setelah service siap
-  useEffect(() => {
-    if (!service) return;
+    fetchDashboard();
+  }, []);
 
-    form.setFieldsValue({
-      name: service.name,
-      code: service.code,
-      description: service.description,
-      assigned_user_ids: service.assigned_user_ids || [],
-      is_active: service.is_active,
-      estimated_time: service.estimated_time ? moment(service.estimated_time, "HH:mm:ss") : null,
-    });
-  }, [service, form]);
-
-  const handleFormSubmit = async (
-    values: AddServiceFormValues & { estimated_time?: Moment | null; is_active?: boolean }
-  ) => {
-    setIsSubmitting(true);
-    try {
-      const payload: AddServiceFormValues & { is_active: boolean } = {
-        ...values,
-        assigned_user_ids: values.assigned_user_ids ?? [],
-        estimated_time: values.estimated_time ? values.estimated_time.format("HH:mm:ss") : null,
-        is_active: values.is_active ?? true,
-      };
-
-      await ServiceService.updateService(id, payload);
-
-      notification.success({ title: "Service berhasil diperbarui" });
-      router.push("/layanan");
-    } catch (error) {
-      console.error(error);
-      notification.error({ title: "Gagal memperbarui service" });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  if (langLoading || users.length === 0 || !service) {
+  if (langLoading || loadingStats) {
     return (
-      <div className="flex justify-center items-center h-40">
+      <div className="flex justify-center items-center h-screen">
         <Spin size="large" />
       </div>
     );
   }
 
+  const filteredServices = services.filter((s) =>
+    s.name.toLowerCase().includes(searchText.toLowerCase())
+  );
+
   return (
-    <div>
-      <Breadcrumbs
-        items={[
-          { label: "Services", href: "/admin/layanan" },
-          { label: "Edit Service", href: `/admin/layanan/edit/${id}` },
-        ]}
-      />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+      <div className="max-w-[1400px] mx-auto space-y-8">
 
-      <h2 className="text-3xl font-semibold mb-4 mt-5">Edit Service</h2>
+        {/* HEADER */}
+        <div className="flex justify-between bg-white p-6 rounded-2xl shadow">
+          <div className="flex items-center gap-4">
+            <Avatar size={64} icon={<SettingOutlined />} className="bg-blue-900" />
+            <div>
+              <Title level={3} className="m-0">
+                {translations?.Sidebar?.adminDashboard || "Admin Dashboard"}
+              </Title>
+              <Text type="secondary">
+                Selamat datang, <b>{user.name}</b>
+              </Text>
+            </div>
+          </div>
+          <RealtimeClock />
+        </div>
 
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleFormSubmit}
-        className="space-y-6"
-      >
-        <Form.Item
-          label="Nama Service"
-          name="name"
-          rules={[{ required: true, message: "Nama service harus diisi" }]}
+        {/* 🔥 STATISTIC CARDS */}
+        <Row gutter={[20, 20]}>
+          <Col xs={24} md={12} lg={6}>
+            <Card className="rounded-2xl shadow-lg bg-gradient-to-r from-blue-500 to-blue-700 text-white">
+              <div className="flex justify-between items-center">
+                <div>
+                  <Text className="text-white/80">Total Pasien</Text>
+                  <div className="text-3xl font-bold">{totalPatients}</div>
+                </div>
+                <TeamOutlined className="text-5xl opacity-30" />
+              </div>
+            </Card>
+          </Col>
+
+          <Col xs={24} md={12} lg={6}>
+            <Card className="rounded-2xl shadow-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
+              <div className="flex justify-between items-center">
+                <div>
+                  <Text className="text-white/80">Total Staff</Text>
+                  <div className="text-3xl font-bold">{totalStaff}</div>
+                </div>
+                <MedicineBoxOutlined className="text-5xl opacity-30" />
+              </div>
+            </Card>
+          </Col>
+
+          <Col xs={24} md={12} lg={6}>
+            <Card className="rounded-2xl shadow-lg !bg-gradient-to-r from-orange-400 to-orange-600 text-white">
+              <div className="flex justify-between items-center">
+                <div>
+                  <Text className="text-white/80">Antrian Hari Ini</Text>
+                  <div className="text-3xl font-bold">{todayQueues}</div>
+                </div>
+                <NumberOutlined className="text-5xl opacity-30" />
+              </div>
+            </Card>
+          </Col>
+
+          <Col xs={24} md={12} lg={6}>
+            <Card className="rounded-2xl shadow-lg !bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+              <div className="flex justify-between items-center">
+                <div>
+                  <Text className="text-white/80">Layanan Aktif</Text>
+                  <div className="text-3xl font-bold">{activeServices}</div>
+                </div>
+                <DatabaseOutlined className="text-5xl opacity-30" />
+              </div>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* TABLE */}
+        <Card
+          title="Daftar Layanan"
+          className="rounded-2xl shadow"
+          extra={
+            <Input
+              placeholder="Cari layanan"
+              prefix={<SearchOutlined />}
+              allowClear
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+          }
         >
-          <Input placeholder="Masukkan nama service" />
-        </Form.Item>
-
-        <Form.Item
-          label="Kode Service"
-          name="code"
-          rules={[{ required: true, message: "Kode Service harus diisi" }]}
-        >
-          <Input placeholder="Masukkan kode service" />
-        </Form.Item>
-
-        <Form.Item label="Deskripsi" name="description">
-          <Input.TextArea placeholder="Deskripsi service" />
-        </Form.Item>
-
-        <Form.Item label="Assign Staff" name="assigned_user_ids">
-          <Select
-            mode="multiple"
-            showSearch
-            placeholder="Pilih staff"
-            optionFilterProp="label"
-            filterOption={(input, option) =>
-              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
-            }
-            options={users.map((user) => ({ value: user.id, label: user.name }))}
+          <Table<Service>
+            rowKey="id"
+            loading={tableLoading}
+            dataSource={filteredServices}
+            pagination={{ pageSize: 5 }}
+            columns={[
+              { title: "Kode", dataIndex: "code", width: 120 },
+              { title: "Layanan", dataIndex: "name" },
+              {
+                title: "Staff",
+                dataIndex: "assigned_user_ids",
+                render: (ids?: number[]) =>
+                  !ids?.length ? (
+                    <Tag>Belum di-assign</Tag>
+                  ) : (
+                    <div className="flex flex-wrap gap-1">
+                      {ids.map((id) => (
+                        <Tag key={id} icon={<UserOutlined />} color="blue">
+                          {staffMap[id]}
+                        </Tag>
+                      ))}
+                    </div>
+                  ),
+              },
+            ]}
           />
-        </Form.Item>
-
-        <Form.Item label="Estimasi Waktu" name="estimated_time">
-          <TimePicker format="HH:mm:ss" />
-        </Form.Item>
-
-        <Form.Item label="Aktif?" name="is_active" valuePropName="checked">
-          <Switch />
-        </Form.Item>
-
-        <Form.Item className="flex justify-end">
-          <Button
-            type="primary"
-            htmlType="submit"
-            icon={<SaveOutlined />}
-            loading={isSubmitting}
-          >
-            Save
-          </Button>
-        </Form.Item>
-      </Form>
+        </Card>
+      </div>
     </div>
   );
 }

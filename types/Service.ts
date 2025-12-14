@@ -42,7 +42,6 @@ export interface AddServiceFormValues {
   code:string;
   description: string;
   assigned_user_ids?: number[];
-  is_active : boolean;
   estimated_time?: string | null; // string format "HH:mm:ss"
 }
 

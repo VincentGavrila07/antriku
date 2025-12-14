@@ -1,7 +1,16 @@
 "use client";
 
 import { useLanguage } from "@/app/languange-context";
-import { Spin, Form, Input, Button, Select, TimePicker, Switch, notification } from "antd";
+import {
+  Spin,
+  Form,
+  Input,
+  Button,
+  Select,
+  TimePicker,
+  Switch,
+  notification,
+} from "antd";
 import { Moment } from "moment";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -10,54 +19,70 @@ import ServiceService from "@/services/ServiceService";
 import UserService from "@/services/UserService";
 import { SaveOutlined } from "@ant-design/icons";
 import { AddServiceFormValues } from "@/types/Service";
+import { User } from "@/types/User";
 
 export default function AddServicePage() {
   const router = useRouter();
   const { translations, loading: langLoading } = useLanguage();
 
   const [form] = Form.useForm();
-  const [users, setUsers] = useState<{ id: number; name: string }[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Load staff/users
+  /* ================= LOAD STAFF (roleId = 3) ================= */
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await UserService.getAllUsers({});
-        setUsers(res.data || []);
+        const res = await UserService.getAllUsers({
+          page: 1,
+          pageSize: 100,
+        });
+
+        // ✅ HANYA STAFF
+        const staffOnly = res.data.filter(
+          (user: User) => user.roleId === 3
+        );
+
+        setUsers(staffOnly);
       } catch (error) {
         console.error(error);
-        notification.error({ title: "Gagal memuat data user" });
+        notification.error({
+          title: "Gagal memuat data staff",
+        });
       }
     };
+
     fetchUsers();
   }, []);
 
-  // Form submit handler
-  const handleFormSubmit = async (values: AddServiceFormValues & { estimated_time?: Moment | null }) => {
+  /* ================= SUBMIT ================= */
+  const handleFormSubmit = async (
+    values: AddServiceFormValues & { estimated_time?: Moment | null }
+  ) => {
     setIsSubmitting(true);
+
     try {
-      // Convert Moment to string HH:mm:ss
       const payload: AddServiceFormValues = {
         ...values,
-        code: values.code,
-        estimated_time: values.estimated_time ? values.estimated_time.format("HH:mm:ss") : undefined,
+        estimated_time:
+          values.estimated_time && values.estimated_time !== null
+            ? values.estimated_time.format("HH:mm:ss")
+            : undefined,
         assigned_user_ids: values.assigned_user_ids ?? [],
-        is_active: true,
-      } as const;
-
-      const sanitizedPayload = {
-        ...payload,
-        estimated_time: payload.estimated_time ?? undefined,
       };
 
-      await ServiceService.addService(sanitizedPayload);
+      await ServiceService.addService(payload as { name: string; description?: string | undefined; assigned_user_ids?: number[] | undefined; is_active?: boolean | undefined; estimated_time?: string | undefined });
 
-      notification.success({ title: "Service berhasil ditambahkan" });
-      router.push("/layanan");
+      notification.success({
+        title: "Service berhasil ditambahkan",
+      });
+
+      router.push("/admin/layanan");
     } catch (error) {
       console.error(error);
-      notification.error({ title: "Gagal menambahkan service" });
+      notification.error({
+        title: "Gagal menambahkan service",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -80,7 +105,9 @@ export default function AddServicePage() {
         ]}
       />
 
-      <h2 className="text-3xl font-semibold mb-4 mt-5">Tambah Service</h2>
+      <h2 className="text-3xl font-semibold mb-4 mt-5">
+        Tambah Service
+      </h2>
 
       <Form
         form={form}
@@ -102,7 +129,7 @@ export default function AddServicePage() {
           name="code"
           rules={[{ required: true, message: "Kode Service harus diisi" }]}
         >
-          <Input placeholder="Masukkan nama service" />
+          <Input placeholder="Masukkan kode service" />
         </Form.Item>
 
         <Form.Item label="Deskripsi" name="description">
@@ -113,12 +140,17 @@ export default function AddServicePage() {
           <Select
             mode="multiple"
             showSearch
-            placeholder="Pilih staff yang bisa ditugaskan"
+            placeholder="Pilih staff"
             optionFilterProp="label"
             filterOption={(input, option) =>
-              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+              (option?.label ?? "")
+                .toLowerCase()
+                .includes(input.toLowerCase())
             }
-            options={users.map((user) => ({ value: user.id, label: user.name }))}
+            options={users.map((user) => ({
+              value: user.id,
+              label: user.name,
+            }))}
           />
         </Form.Item>
 
@@ -126,9 +158,6 @@ export default function AddServicePage() {
           <TimePicker format="HH:mm:ss" />
         </Form.Item>
 
-        <Form.Item label="Aktif?" name="is_active" valuePropName="checked">
-          <Switch />
-        </Form.Item>
 
         <Form.Item className="flex justify-end">
           <Button

@@ -64,7 +64,7 @@ const UserService = {
 
   getAllUsers: async (
     params: {
-      filters?: { name?: string };
+      filters?: { name?: string , roleId?:number};
       page?: number;
       pageSize?: number;
     }
@@ -166,6 +166,26 @@ const UserService = {
     });
     return response.data;
   },
+
+  getTotalUserByRole: async (roleId: number) => {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get<{
+      roleId: number;
+      total: number;
+    }>(
+      `${BASE_URL}/admin/total-by-role`,
+      {
+        params: { roleId },
+        headers: token
+          ? { Authorization: `Bearer ${token}` }
+          : undefined,
+      }
+    );
+
+    return response.data;
+  },
+
 
 
 };
