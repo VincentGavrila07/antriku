@@ -265,7 +265,7 @@ export default function CustomerDashboard() {
         {/* Bottom Row: Riwayat & Profil */}
         <Row gutter={[16, 16]}>
           {/* Informasi Banner */}
-          <Col xs={24} md={8}>
+          <Col xs={24} lg={16}>
             <Text
               strong
               className="text-gray-500 text-xs tracking-wider uppercase mb-3 block"
@@ -297,37 +297,6 @@ export default function CustomerDashboard() {
               </div>
             </Card>
           </Col>
-
-          {/* Riwayat */}
-          <Col xs={24} md={8}>
-            <div className="flex justify-between items-center mb-3">
-              <Text
-                strong
-                className="text-gray-500 text-xs tracking-wider uppercase"
-              >
-                RIWAYAT TERAKHIR
-              </Text>
-              <Badge
-                count={0}
-                style={{ backgroundColor: "#ef4444", fontSize: "10px", boxShadow: "none" }}
-              />
-            </div>
-            <Card className={CARD_HEIGHT_CLASS} styles={{ body: { padding: 0, height: "100%" } }}>
-              <div className="flex-1 overflow-y-auto custom-scrollbar min-h-[200px]">
-                {/* TODO: ambil riwayat user dari API */}
-              </div>
-              <div className="p-3 text-center border-t border-gray-100 bg-white z-10 mt-auto">
-                <Button
-                  type="link"
-                  size="small"
-                  className="text-xs font-bold text-gray-500 hover:text-blue-600"
-                >
-                  Lihat Semua
-                </Button>
-              </div>
-            </Card>
-          </Col>
-
           {/* Profil */}
           <Col xs={24} md={8}>
             <Text
