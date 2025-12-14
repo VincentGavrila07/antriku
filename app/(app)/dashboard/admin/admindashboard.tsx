@@ -37,6 +37,7 @@ const { Title, Text } = Typography;
 const RealtimeClock = memo(() => {
   const [time, setTime] = useState("");
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTime(
       new Date().toLocaleTimeString("id-ID", {
         hour: "2-digit",

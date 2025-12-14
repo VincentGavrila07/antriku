@@ -20,7 +20,10 @@ export interface Translations {
   };
   welcome:{
     welcome:string;
-  }
+  },
+  userManagement: {
+    ListUser: string;
+  };
   
 }
 

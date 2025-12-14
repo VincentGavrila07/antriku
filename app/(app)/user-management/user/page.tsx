@@ -18,7 +18,6 @@ export default function UserManagementPage() {
   const router = useRouter();
   const { translations, loading: langLoading } = useLanguage();
   const { permissions, loading: permissionLoading } = usePermission();
-
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchText, setSearchText] = useState("");
@@ -57,7 +56,7 @@ export default function UserManagementPage() {
     });
   }
 
-  const t = translations.Sidebar;
+  const t = translations.userManagement;
 
   const handleDeleteUser = async (userId: string) => {
     console.log("Attempting to delete user:", userId); 
@@ -97,7 +96,7 @@ export default function UserManagementPage() {
         items={[{ label: "User", href: "/admin/user-management/user" }]}
       />
 
-      <h2 className="text-3xl font-semibold mb-4 mt-5">List User</h2>
+      <h2 className="text-3xl font-semibold mb-4 mt-5">{t.ListUser}</h2>
 
       <div className="flex justify-end items-center mt-4 mb-6 gap-5">
         <Input
