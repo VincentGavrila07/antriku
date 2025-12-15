@@ -8,12 +8,20 @@
   import TableServiceOrder from "@/app/Tables/table-service-order";
   import { Service, ServiceResponsePagination } from "@/types/Service";
   import ServiceService from "@/services/ServiceService";
+  import { useLanguage } from "@/app/languange-context";
+  import type { Translations } from "@/app/languange-context";
 
   export default function OrderPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedService, setSelectedService] = useState<Service | null>(null);
-    const [staffList, setStaffList] = useState<{ id: number; name: string }[]>([]);
+    const [selectedService, setSelectedService] = useState<Service | null>(
+      null
+    );
+    const [staffList, setStaffList] = useState<{ id: number; name: string }[]>(
+      []
+    );
     const [form] = Form.useForm();
+    const { translations, loading: langLoading } = useLanguage();
+    const t: Translations["order"] | undefined = translations?.order;
 
     const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
     const queryClient = useQueryClient();
@@ -23,8 +31,8 @@
     const [pageSize, setPageSize] = useState(10);
 
     /* ===============================
-    * FETCH SERVICE LIST
-    * =============================== */
+     * FETCH SERVICE LIST
+     * =============================== */
     const { data: services, isLoading } = useQuery<
       ServiceResponsePagination<Service[]>,
       Error
@@ -38,15 +46,15 @@
     });
 
     /* ===============================
-    * BOOK SERVICE MUTATION
-    * =============================== */
+     * BOOK SERVICE MUTATION
+     * =============================== */
     const bookServiceMutation = useMutation({
       mutationFn: ServiceService.bookService,
       onSuccess: (res) => {
         const queueCode = res.data?.queue_code;
         notification.success({
-          title: "Booking Berhasil",
-          description: `Nomor antrian kamu: ${queueCode}`,
+          title: t?.SuccessBooking,
+          description: t ? t.QueueNumber + ": " + queueCode : undefined,
         });
 
         setIsModalOpen(false);
@@ -55,22 +63,20 @@
       },
       onError: () => {
         notification.error({
-          title: "Booking Gagal",
-          description: "Masih Ada Antrian Yang Aktif",
+          title: t?.ErrorBooking,
+          description: t?.ActiveQueueExists,
         });
       },
     });
 
     /* ===============================
-    * CLICK ORDER
-    * =============================== */
+     * CLICK ORDER
+     * =============================== */
     const handleOrderClick = async (service: Service) => {
       setSelectedService(service);
 
       try {
-        const res = await fetch(
-          `${BASE_URL}/services/${service.id}/staff`
-        );
+        const res = await fetch(`${BASE_URL}/services/${service.id}/staff`);
         const data = await res.json();
         setStaffList(data.staff ?? []);
       } catch {
@@ -81,8 +87,8 @@
     };
 
     /* ===============================
-    * SUBMIT MODAL
-    * =============================== */
+     * SUBMIT MODAL
+     * =============================== */
     const handleModalOk = async () => {
       try {
         const values = await form.validateFields();
@@ -90,8 +96,8 @@
         const userRaw = localStorage.getItem("user");
         if (!userRaw || !selectedService) {
           notification.error({
-            title: "User atau Service tidak valid",
-            description: "Silakan login ulang",
+            title: t?.InvalidUserOrService,
+            description: t?.PleaseRelogin,
           });
           return;
         }
@@ -108,25 +114,19 @@
       }
     };
 
-
-
     const handleModalCancel = () => {
       setIsModalOpen(false);
       form.resetFields();
     };
 
     /* ===============================
-    * RENDER
-    * =============================== */
+     * RENDER
+     * =============================== */
     return (
       <div className="p-6">
-        <Breadcrumbs
-          items={[{ label: "Order Service", href: "/order" }]}
-        />
+        <Breadcrumbs items={[{ label: t?.OrderService ?? "", href: "/order" }]} />
 
-        <h2 className="text-3xl font-semibold mb-6 mt-5">
-          Order Service
-        </h2>
+        <h2 className="text-3xl font-semibold mb-6 mt-5">{t?.OrderService}</h2>
 
         <TableServiceOrder
           data={services?.data ?? []}
@@ -142,21 +142,26 @@
         />
 
         <Modal
-          title={`Pesan ${selectedService?.name}`}
+          title={
+            t
+              ? t.BookingTitle +
+                (selectedService ? ` ${selectedService.name}` : "")
+              : undefined
+          }
           open={isModalOpen}
           onOk={handleModalOk}
           onCancel={handleModalCancel}
-          okText="Pesan"
+          okText={t?.Book}
           confirmLoading={bookServiceMutation.isPending}
         >
           <Form form={form} layout="vertical">
             <Form.Item
-              label="Pilih Staff"
+              label={t?.SelectStaff}
               name="staff_id"
-              rules={[{ required: true, message: "Pilih staff" }]}
+              rules={[{ required: true, message: t?.SelectStaffRequired }]}
             >
               <Select
-                placeholder="Pilih staff"
+                placeholder={t?.SelectStaff}
                 options={staffList.map((s) => ({
                   value: s.id,
                   label: s.name,
@@ -165,9 +170,9 @@
             </Form.Item>
 
             <Form.Item
-              label="Tanggal Kedatangan"
+              label={t?.ArrivalDate}
               name="date"
-              rules={[{ required: true, message: "Pilih tanggal kedatangan" }]}
+              rules={[{ required: true, message: t?.ArrivalDateRequired }]}
             >
               <DatePicker
                 className="w-full"

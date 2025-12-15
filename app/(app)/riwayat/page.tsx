@@ -1,6 +1,6 @@
 "use client";
 
-import { useLanguage } from "@/app/languange-context";
+import { Translations, useLanguage } from "@/app/languange-context";
 import { Spin, notification, Select, DatePicker } from "antd";
 import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -17,6 +17,9 @@ const { Option } = Select;
 export default function ServiceHistoryPage() {
   const router = useRouter();
   const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["serviceHistory"] | undefined =
+    translations?.serviceHistory;
+
   const { permissions, loading: permissionLoading } = usePermission();
 
   const [page, setPage] = useState(1);
@@ -46,22 +49,20 @@ export default function ServiceHistoryPage() {
         pageSize,
         status,
         queue_date: queueDate,
-        user_id : userId
+        user_id: userId,
       }),
     // enabled:
     //   !!roleId && permissions.includes("view-service-history"),
   });
 
-  
-
-//   useEffect(() => {
-//     if (
-//       !permissionLoading &&
-//       !permissions.includes("view-service-history")
-//     ) {
-//       router.replace("/forbidden");
-//     }
-//   }, [permissions, permissionLoading, router]);
+  //   useEffect(() => {
+  //     if (
+  //       !permissionLoading &&
+  //       !permissions.includes("view-service-history")
+  //     ) {
+  //       router.replace("/forbidden");
+  //     }
+  //   }, [permissions, permissionLoading, router]);
 
   if (langLoading || permissionLoading || !translations) {
     return (
@@ -73,44 +74,46 @@ export default function ServiceHistoryPage() {
 
   if (error) {
     notification.error({
-      title: "Gagal Memuat Riwayat Layanan",
-      description: "Terjadi kesalahan saat mengambil data service history",
+      title: t?.ErrorLoadServiceHistory || "Failed to load service history",
+      description:
+        t?.ErrorLoadServiceHistoryDesc ||
+        "An error occurred while fetching service history data",
     });
   }
 
   return (
     <div>
       <Breadcrumbs
-        items={[{ label: "Service", href: "/admin/service-history" }]}
+        items={[
+          { label: t?.Service || "Service", href: "/admin/service-history" },
+        ]}
       />
 
       <h2 className="text-3xl font-semibold mb-4 mt-5">
-        Service History
+        {t?.ServiceHistory || "Service History"}
       </h2>
 
       {/* FILTER */}
       <div className="flex gap-4 mb-6 justify-end">
         <Select
           allowClear
-          placeholder="Status"
+          placeholder={t?.Status || "Status"}
           className="w-48"
           onChange={(value) => {
             setStatus(value);
             setPage(1);
           }}
         >
-          <Option value="waiting">Waiting</Option>
-          <Option value="completed">Completed</Option>
-          <Option value="cancelled">Cancelled</Option>
+          <Option value="waiting">{t?.Waiting || "Waiting"}</Option>
+          <Option value="completed">{t?.Completed || "Completed"}</Option>
+          <Option value="cancelled">{t?.Cancelled || "Cancelled"}</Option>
         </Select>
 
         <DatePicker
-          placeholder="Queue Date"
+          placeholder={t?.QueueDate || "Queue Date"}
           className="w-48"
           onChange={(date) => {
-            setQueueDate(
-              date ? dayjs(date).format("YYYY-MM-DD") : undefined
-            );
+            setQueueDate(date ? dayjs(date).format("YYYY-MM-DD") : undefined);
             setPage(1);
           }}
         />

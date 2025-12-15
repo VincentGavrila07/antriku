@@ -4,6 +4,7 @@ import React, { useState, useEffect, memo } from "react";
 import { User } from "@/types/User";
 import { Service } from "@/types/Service";
 import { useLanguage } from "@/app/languange-context";
+import type { Translations } from "@/app/languange-context";
 import {
   Spin,
   Card,
@@ -65,10 +66,69 @@ RealtimeClock.displayName = "RealtimeClock";
 interface AdminDashboardProps {
   user: User;
 }
-
 export default function AdminDashboard({ user }: AdminDashboardProps) {
   const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["dashboard"] | undefined = translations?.dashboard;
   const [searchText, setSearchText] = useState("");
+
+  /* ================= FETCH DATA ================= */
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        setLoadingStats(true);
+        setTableLoading(true);
+
+        /* ===== USER STATS ===== */
+        const patientRes = await UserService.getTotalUserByRole(2);
+        const staffRes = await UserService.getTotalUserByRole(3);
+
+        /* ===== AMBIL STAFF SAJA (roleId = 3) ===== */
+        const staffListRes = await UserService.getAllUsers({
+          page: 1,
+          pageSize: 100,
+          filters: {
+            roleId: 3, // 🔥 PENTING
+          },
+        });
+
+        const staffNameMap: Record<number, string> = {};
+        staffListRes.data.forEach((u: User) => {
+          staffNameMap[u.id] = u.name;
+        });
+        setStaffMap(staffNameMap);
+
+        /* ===== AMBIL SERVICE ===== */
+        const serviceRes = await ServiceService.getAllService({
+          page: 1,
+          pageSize: 100,
+        });
+
+        /* ===== QUEUE HARI INI ===== */
+        const today = new Date().toISOString().split("T")[0];
+        let totalServeToday = 0;
+
+        try {
+          const serveRes = await ServiceService.getTotalServe({
+            queue_date: today,
+          });
+          totalServeToday = serveRes.total_completed_services;
+        } catch {}
+
+        setTotalPatients(patientRes.total);
+        setTotalStaff(staffRes.total);
+        setActiveServices(serviceRes.total);
+        setTodayQueues(totalServeToday);
+        setServices(serviceRes.data);
+      } catch (err) {
+        console.error("Gagal memuat dashboard", err);
+      } finally {
+        setLoadingStats(false);
+        setTableLoading(false);
+      }
+    };
+
+    fetchDashboard();
+  }, []);
 
   /* ================= STATS ================= */
   const [totalPatients, setTotalPatients] = useState(0);

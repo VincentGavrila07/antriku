@@ -123,6 +123,97 @@ export interface Translations {
     DeleteUserConfirmCancel: string;
     SearchByName: string;
   };
+  order: {
+    OrderService: string;
+    SuccessBooking: string;
+    QueueNumber: string;
+    ErrorBooking: string;
+    ActiveQueueExists: string;
+    InvalidUserOrService: string;
+    PleaseRelogin: string;
+    BookingTitle: string;
+    Book: string;
+    SelectStaff: string;
+    SelectStaffRequired: string;
+    ArrivalDate: string;
+    ArrivalDateRequired: string;
+  };
+  serviceHistory: {
+    Service: string;
+    ServiceHistory: string;
+    ErrorLoadServiceHistory: string;
+    ErrorLoadServiceHistoryDesc: string;
+    Status: string;
+    Waiting: string;
+    Completed: string;
+    Cancelled: string;
+    QueueDate: string;
+  };
+  dashboard: {
+    Loading: string;
+    AdminDashboard: string;
+    Welcome: string;
+    Administrator: string;
+    ServerTime: string;
+    TotalPatients: string;
+    Growth: string;
+    TotalStaff: string;
+    ActiveDoctors: string;
+    TodayQueues: string;
+    BusySmooth: string;
+    ActiveServices: string;
+    ServiceStatusAndQueue: string;
+    SearchServiceOrStaff: string;
+    ServiceName: string;
+    Status: string;
+    Staff: string;
+    Queue: string;
+    People: string;
+    Open: string;
+    Break: string;
+    Closed: string;
+    Online: string;
+    Busy: string;
+    Offline: string;
+    PatientDashboard: string;
+    WelcomeBack: string;
+    YourActiveQueue: string;
+    QueueNumber: string;
+    WaitingProcess: string;
+    InProcess: string;
+    Service: string;
+    Estimate: string;
+    BeingServed: string;
+    NoActiveQueue: string;
+    ServiceList: string;
+    Information: string;
+    Latest: string;
+    RainySeasonHealth: string;
+    ImmunityTips: string;
+    MyProfile: string;
+    RegularPatient: string;
+    Verified: string;
+    Email: string;
+    PhoneNumber: string;
+    ViewProfileDetail: string;
+    NoInitialNote: string;
+    StaffDashboard: string;
+    CurrentSession: string;
+    InitialComplaint: string;
+    FinishQueue: string;
+    NoPatientInService: string;
+    StartQueue: string;
+    NoQueue: string;
+    MyQueue: string;
+    Next: string;
+    TotalServingToday: string;
+    AllServices: string;
+    Notes: string;
+    BreakNote: string;
+    MonthlyMeeting: string;
+    NewNotePlaceholder: string;
+    CheckIn: string;
+  };
 }
 
 interface LanguageContextType {
@@ -132,7 +223,9 @@ interface LanguageContextType {
   changeLanguage: (lang: string) => void;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextType | undefined>(
+  undefined
+);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLang] = useState<string>("en");
@@ -151,7 +244,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       setTranslations(data);
       localStorage.setItem("translations", JSON.stringify(data));
       localStorage.setItem("lang", selectedLang);
-
     } catch (err) {
       console.error("Error fetch translations:", err);
     } finally {
@@ -190,7 +282,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <LanguageContext.Provider value={{ lang, translations, loading, changeLanguage }}>
+    <LanguageContext.Provider
+      value={{ lang, translations, loading, changeLanguage }}
+    >
       {children}
     </LanguageContext.Provider>
   );

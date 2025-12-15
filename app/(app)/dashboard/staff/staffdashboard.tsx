@@ -29,6 +29,7 @@ import ServiceService from "@/services/ServiceService";
 import { MyService, User } from "@/types/User";
 import { CurrentSession, QueueByServiceResponse } from "@/types/Service";
 import HistoryQueueList from "@/app/components/historyQueueList";
+import { Translations, useLanguage } from "@/app/languange-context";
 const { Title, Text } = Typography;
 
 type ExtendedCurrentSession = CurrentSession & {
@@ -78,6 +79,9 @@ interface StaffDashboardProps {
 }
 
 export default function StaffDashboard({ user }: StaffDashboardProps) {
+  const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["dashboard"] | undefined = translations?.dashboard;
+  
   const queryClient = useQueryClient();
 
   const token =
@@ -227,7 +231,7 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center px-6 py-4 border-b">
           <Title level={3} className="m-0 font-bold">
-            {staffUser?.name ?? "Staff"}
+            {staffUser?.name ?? (t?.StaffDashboard || "Staff")}
           </Title>
           <RealtimeClock />
         </div>
@@ -236,7 +240,7 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
           {/* Main Content (Left/Center Column) */}
           <div className="md:col-span-2 p-6 space-y-6">
             <Text strong className="text-sm uppercase text-gray-500">
-              SESI SAAT INI
+              {t?.CurrentSession || "CURRENT SESSION"}
             </Text>
 
             {/* Current Queue Card */}
@@ -256,13 +260,7 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
                       </Text>
                       {currentQueue.checkInTime && (
                         <Text className="text-xs">
-                          Check-in:{" "}
-                          {new Date(
-                            currentQueue.checkInTime
-                          ).toLocaleTimeString("id-ID", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {t?.CheckIn || "Check-in"}: {new Date(currentQueue.checkInTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
                         </Text>
                       )}
                     </div>
@@ -271,10 +269,10 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
 
                 <div className="mt-4 pt-4 border-t border-dashed">
                   <Text strong className="block mb-1">
-                    KELUHAN / CATATAN AWAL:
+                    {t?.InitialComplaint || "INITIAL COMPLAINT / NOTE:"}
                   </Text>
                   <Text className="italic text-gray-600">
-                    {currentQueue.initialComplaint ?? "Tidak ada catatan awal"}
+                    {currentQueue.initialComplaint ?? (t?.NoInitialNote || "No initial note")}
                   </Text>
                 </div>
 
@@ -286,12 +284,12 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
                   onClick={handleFinishQueue}
                   disabled={!currentSession}
                 >
-                  Selesai Pengerjaan
+                  {t?.FinishQueue || "Finish Queue"}
                 </Button>
               </div>
             ) : (
               <div className="border border-gray-200 rounded-lg p-6 shadow-sm text-center">
-                <Empty description="Tidak ada pasien sedang dilayani" />
+                <Empty description={t?.NoPatientInService || "No patient in service"} />
                 <Button
                   type="primary"
                   size="large"
@@ -301,8 +299,8 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
                   disabled={queueList.length === 0}
                 >
                   {queueList.length > 0
-                    ? `Mulai Pengerjaan: ${queueList[0].patientName}`
-                    : "Tidak Ada Antrian"}
+                    ? `${t?.StartQueue || "Start Queue"}: ${queueList[0].patientName}`
+                    : t?.NoQueue || "No Queue"}
                 </Button>
               </div>
             )}
@@ -310,13 +308,13 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
             {/* Next Queue and Remaining Queue List */}
             <div className="pt-4 space-y-4">
               <Text strong className="text-sm uppercase text-gray-500 block">
-                ANTRIAN SAYA ({queueList.length})
+                {t?.MyQueue || "MY QUEUE"} ({queueList.length})
               </Text>
 
               {/* Next Queue - Separate Styling */}
               {nextQueue && (
                 <Card
-                  title="SELANJUTNYA"
+                  title={t?.Next || "NEXT"}
                   size="small"
                   className="shadow-sm border-2 border-orange-200"
                 >
@@ -340,14 +338,12 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
                   strong
                   className="text-xs uppercase tracking-wider block text-white opacity-90"
                 >
-                  Total Serving (Hari Ini)
+                  {t?.TotalServingToday || "Total Serving (Today)"}
                 </Text>
                 <Text className="text-[10px] block text-white opacity-90 mb-1">
-                  {totalServeResponse?.service || "Semua Layanan"}
+                  {totalServeResponse?.service || t?.AllServices || "All Services"}
                 </Text>
                 <Title level={2} className="m-0 text-white font-bold">
-                  {" "}
-                  {/* Level 1 kegedean buat sidebar */}
                   {totalServeResponse?.total_completed_services ?? 0}
                 </Title>
               </div>
@@ -358,22 +354,22 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
               title={
                 <div className="flex justify-between items-center">
                   <Text strong className="text-xs">
-                    NOTES
+                    {t?.Notes || "NOTES"}
                   </Text>
                   <Text className="text-xs text-gray-500">2/5</Text>
                 </div>
               }
               size="small"
-              className="shadow-sm mb-6" // Kasih margin bottom biar ga nempel sama elemen bawahnya pas di mobile
+              className="shadow-sm mb-6"
               extra={<PlusOutlined className="cursor-pointer text-xs" />}
-              styles={{ body: { padding: "12px" } }} // Padding dalem dikecilin dikit biar muat
+              styles={{ body: { padding: "12px" } }}
             >
               <div className="space-y-3">
                 <div className="bg-white p-2.5 rounded border border-gray-200 flex items-start gap-2">
                   <ClockCircleOutlined className="text-blue-500 mt-0.5 text-xs" />
                   <div className="flex flex-col">
                     <Text className="text-xs font-bold text-gray-600">
-                      Istirahat
+                      {t?.BreakNote || "Break"}
                     </Text>
                     <Text className="text-xs text-gray-500">12:00 - 13:00</Text>
                   </div>
@@ -383,7 +379,7 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
                   <ClockCircleOutlined className="text-blue-500 mt-0.5 text-xs" />
                   <div className="flex flex-col">
                     <Text className="text-xs font-bold text-gray-600">
-                      Rapat Bulanan
+                      {t?.MonthlyMeeting || "Monthly Meeting"}
                     </Text>
                     <Text className="text-xs text-gray-500">Jumat, 16:00</Text>
                   </div>
@@ -392,7 +388,7 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
                 <div className="mt-2">
                   <input
                     type="text"
-                    placeholder="Note baru..."
+                    placeholder={t?.NewNotePlaceholder || "New note..."}
                     className="w-full p-2 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
@@ -402,8 +398,6 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
             {/* History Queue List */}
             {activeService && (
               <div className="mt-6">
-                {" "}
-                {/* Bungkus history biar rapi */}
                 <HistoryQueueList
                   serviceId={activeService.id}
                   queueDate={todayDate}
