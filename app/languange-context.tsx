@@ -14,9 +14,18 @@ export interface Translations {
     service: string;
     staffDashboard: string;
     orders: string;
+    history: string;
+    display: string;
     myDashboard: string;
     profile: string;
     logout: string;
+  };
+  display: {
+    title: string;
+    loading: string;
+    nowServing: string;
+    next: string;
+    dash: string;
   };
   Forbidden: {
     Forbidden: string;

@@ -15,6 +15,9 @@ import {
 import UserService from "@/services/UserService";
 import { useLanguage } from "@/app/languange-context";
 import Link from "next/link";
+import {
+  GlobalOutlined,
+} from "@ant-design/icons";
 
 const { Sider } = Layout;
 
@@ -76,7 +79,7 @@ export default function Sidebar({ roleId }: SidebarProps) {
     {
       key: "profile",
       icon: <ProfileOutlined />,
-      label: <Link href={'/profile'}>Profile</Link>,
+      label: <Link href={"/profile"}>{t.profile}</Link>,
     },
 
     roleId === 1 && {
@@ -111,22 +114,22 @@ export default function Sidebar({ roleId }: SidebarProps) {
     roleId === 2 && {
       key: "orders",
       icon: <ShoppingCartOutlined />,
-      label: <Link href="/order">Order</Link>,
+      label: <Link href="/order">{t.orders}</Link>,
     },
     roleId === 2 && {
       key: "history",
       icon: <ShoppingCartOutlined />,
-      label: <Link href="/riwayat">History</Link>,
+      label: <Link href="/riwayat">{t.history}</Link>,
     },
     roleId === 1 && {
       key: "history",
       icon: <ShoppingCartOutlined />,
-      label: <Link href="/riwayat">History</Link>,
+      label: <Link href="/riwayat">{t.history}</Link>,
     },
     roleId === 1 && {
       key: "display",
       icon: <ShoppingCartOutlined />,
-      label: <Link href="/DisplayService">Display</Link>,
+      label: <Link href="/DisplayService">{t.display}</Link>,
     },
   ].filter(Boolean) as MenuProps["items"];
 
@@ -156,38 +159,82 @@ export default function Sidebar({ roleId }: SidebarProps) {
           />
         </div>
 
-        <button
-          onClick={() => changeLanguage("en")}
-          className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-300 transform ${
-            lang === "en"
-              ? "bg-blue-600 text-blue-700 shadow-md scale-105"
-              : "text-blue-100 hover:text-white hover:bg-blue-700/50"
-          }`}
-        >
-          EN
-        </button>
+        {/* --- FOOTER AREA (Language & Logout) --- */}
+        <div className="pt-4 mt-auto border-t border-blue-500/30">
+          
+          {/* 1. LANGUAGE CONTROL PANEL */}
+          <div className={`
+            bg-blue-900/30 rounded-xl p-3 mb-4 backdrop-blur-sm transition-all duration-300
+            ${collapsed ? "flex flex-col items-center justify-center gap-2" : "block"}
+          `}>
+            
+            {/* Label 'Language' (Hanya muncul saat tidak collapsed) */}
+            {!collapsed && (
+              <div className="flex items-center gap-2 mb-3 text-blue-200 px-1">
+                <GlobalOutlined className="text-sm" />
+                <span className="text-[10px] font-bold uppercase tracking-widest opacity-80">
+                  Language
+                </span>
+              </div>
+            )}
 
-        <button
-          onClick={() => changeLanguage("id")}
-          className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-300 transform ${
-            lang === "id"
-              ? "bg-blue-600 text-blue-700 shadow-md scale-105"
-              : "text-blue-100 hover:text-white hover:bg-blue-700/50"
-          }`}
-        >
-          ID
-        </button>
-        
-        <Button
-          onClick={handleLogout}
-          type="primary"
-          danger
-          className="flex items-center justify-center gap-2 w-full mt-6 shrink-0"
-          icon={<LogoutOutlined />}
-        >
-          {!collapsed && t.logout}
-        </Button>
-      </div>
+            {/* Ikon Globe (Muncul saat Collapsed sebagai pengganti label) */}
+            {collapsed && <GlobalOutlined className="text-blue-200 text-lg mb-1" />}
+
+            {/* Tombol Switcher (Grid Layout biar lega) */}
+            <div className={`
+               w-full transition-all duration-300
+               ${collapsed ? "flex flex-col gap-2" : "grid grid-cols-2 gap-2"}
+            `}>
+              {/* Tombol EN */}
+              <button
+                onClick={() => changeLanguage("en")}
+                className={`
+                  relative flex items-center justify-center font-bold transition-all duration-300 rounded-lg
+                  ${collapsed ? "w-8 h-8 text-[10px] p-0" : "py-2 text-xs"}
+                  ${lang === "en"
+                    ? "bg-white text-blue-700 shadow-md scale-[1.02]" // Aktif: Putih
+                    : "bg-blue-800/50 text-blue-200 hover:bg-blue-700 hover:text-white" // Tidak Aktif: Transparan
+                  }
+                `}
+              >
+                EN
+              </button>
+
+              {/* Tombol ID */}
+              <button
+                onClick={() => changeLanguage("id")}
+                className={`
+                  relative flex items-center justify-center font-bold transition-all duration-300 rounded-lg
+                  ${collapsed ? "w-8 h-8 text-[10px] p-0" : "py-2 text-xs"}
+                  ${lang === "id"
+                    ? "bg-white text-blue-700 shadow-md scale-[1.02]" // Aktif: Putih
+                    : "bg-blue-800/50 text-blue-200 hover:bg-blue-700 hover:text-white" // Tidak Aktif: Transparan
+                  }
+                `}
+              >
+                ID
+              </button>
+            </div>
+          </div>
+
+          {/* 2. LOGOUT BUTTON */}
+          <Button
+            onClick={handleLogout}
+            type="primary"
+            danger
+            block={!collapsed}
+            shape={collapsed ? "circle" : "default"}
+            className={`
+              flex items-center justify-center shadow-lg border-none transition-all duration-300
+              ${collapsed ? "w-10 h-10 mx-auto" : "h-11 font-semibold tracking-wide bg-red-500 hover:bg-red-600"}
+            `}
+            icon={<LogoutOutlined />}
+          >
+            {!collapsed && t.logout}
+          </Button>
+        </div>
+        </div>
     </Sider>
   );
 }
