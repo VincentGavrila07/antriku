@@ -214,6 +214,77 @@ export interface Translations {
     NewNotePlaceholder: string;
     CheckIn: string;
   };
+  service: {
+    Services: string;
+    AddService: string;
+    EditService: string;
+    ServiceName: string;
+    ServiceNameRequired: string;
+    ServiceNamePlaceholder: string;
+    ServiceCode: string;
+    ServiceCodeRequired: string;
+    ServiceCodePlaceholder: string;
+    Description: string;
+    DescriptionPlaceholder: string;
+    AssignStaff: string;
+    AssignStaffPlaceholder: string;
+    AssignStaffEditPlaceholder: string;
+    EstimatedTime: string;
+    IsActive: string;
+    Save: string;
+    SuccessAddService: string;
+    SuccessEditService: string;
+    ErrorAddService: string;
+    ErrorEditService: string;
+    ErrorLoadUser: string;
+    ErrorLoadService: string;
+    ErrorLoadServiceTitle: string;
+    ErrorLoadServiceDesc: string;
+    SuccessDeleteService: string;
+    ErrorDeleteServiceTitle: string;
+    ErrorDeleteServiceDesc: string;
+    DeleteServiceConfirmTitle: string;
+    DeleteServiceConfirmText: string;
+    DeleteServiceConfirmOk: string;
+    DeleteServiceConfirmCancel: string;
+    ListService: string;
+    SearchByNameService: string;
+    AddServiceButton: string;
+  };
+  profile: {
+    EditProfile: string;
+    Name: string;
+    NameRequired: string;
+    NamePlaceholder: string;
+    ChangePassword: string;
+    NewPassword: string;
+    NewPasswordMin: string;
+    NewPasswordPlaceholder: string;
+    ConfirmCurrentPassword: string;
+    ConfirmCurrentPasswordRequired: string;
+    ConfirmCurrentPasswordPlaceholder: string;
+    Save: string;
+    SuccessEditProfile: string;
+    ErrorEditProfile: string;
+    ErrorEditProfileDesc: string;
+    MyProfile: string;
+  };
+  reports: {
+    GenerateServiceReport: string;
+    SelectDatePlaceholder: string;
+    GenerateReport: string;
+    WarningTitle: string;
+    WarningDesc: string;
+    SuccessTitle: string;
+    SuccessDesc: string;
+    ErrorTitle: string;
+    ErrorDesc: string;
+    OpenManually: string;
+    HelperText: string;
+  };
+  tables: {
+
+  };
 }
 
 interface LanguageContextType {

@@ -1,10 +1,11 @@
 "use client";
 
+
 import React, { useState } from "react";
 import { Button, DatePicker, notification, Spin, Typography, Card } from "antd";
 import { Moment } from "moment";
 import ReportService from "@/services/ReportService";
-import { useLanguage } from "@/app/languange-context";
+import { useLanguage, Translations } from "@/app/languange-context";
 
 const { Title, Text } = Typography;
 
@@ -13,12 +14,13 @@ export default function ReportsPage() {
   const [loading, setLoading] = useState(false);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const { translations } = useLanguage();
-  const t = translations?.report;
+  const t: Translations["reports"] | undefined = translations?.reports;
+
   const handleGenerateReport = async () => {
     if (!reportDate) {
       notification.warning({
-        title: "Peringatan",
-        description: "Tanggal harus dipilih terlebih dahulu!",
+        title: t?.WarningTitle,
+        description: t?.WarningDesc,
       });
       return;
     }
@@ -28,28 +30,24 @@ export default function ReportsPage() {
 
     try {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
-
       const response = await ReportService.generateServiceReport(
         reportDate.format("YYYY-MM-DD"),
         user?.id
       );
-
       notification.success({
-        title: "Berhasil",
-        description: "Report berhasil dibuat. Sedang membuka file...",
+        title: t?.SuccessTitle,
+        description: t?.SuccessDesc,
       });
-
       const url = response.file_url;
       setFileUrl(url);
-
       if (url) {
         window.open(url, "_blank");
       }
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error(error);
       notification.error({
-        title: "Gagal",
-        description: "Gagal generate report. Pastikan server berjalan.",
+        title: t?.ErrorTitle,
+        description: t?.ErrorDesc,
       });
     } finally {
       setLoading(false);
@@ -67,7 +65,6 @@ export default function ReportsPage() {
         <Title level={3} className="text-center mb-6 text-gray-800">
           {t?.GenerateServiceReport}
         </Title>
-
         <div className="flex flex-col gap-6 w-full">
           <div className="flex flex-col md:flex-row items-center gap-4">
             <DatePicker
@@ -76,7 +73,7 @@ export default function ReportsPage() {
               format="YYYY-MM-DD"
               className="flex-1 w-full"
               size="large"
-              placeholder="Pilih Tanggal Laporan"
+              placeholder={t?.SelectDatePlaceholder}
             />
             <Button
               type="primary"
@@ -88,7 +85,6 @@ export default function ReportsPage() {
               {loading ? <Spin size="small" /> : t?.GenerateReport}
             </Button>
           </div>
-
           {fileUrl && (
             <div className="flex justify-center animate-fade-in">
               <Button
@@ -101,10 +97,9 @@ export default function ReportsPage() {
               </Button>
             </div>
           )}
-
           {!fileUrl && !loading && (
             <Text type="secondary" className="text-center text-sm">
-              {t?.Keterangan}
+              {t?.HelperText}
             </Text>
           )}
         </div>

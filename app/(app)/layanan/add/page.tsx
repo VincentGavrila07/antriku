@@ -1,6 +1,6 @@
 "use client";
 
-import { useLanguage } from "@/app/languange-context";
+import { Translations, useLanguage } from "@/app/languange-context";
 import {
   Spin,
   Form,
@@ -8,6 +8,7 @@ import {
   Button,
   Select,
   TimePicker,
+  Switch,
   notification,
 } from "antd";
 import { Moment } from "moment";
@@ -23,7 +24,7 @@ import { User } from "@/types/User";
 export default function AddServicePage() {
   const router = useRouter();
   const { translations, loading: langLoading } = useLanguage();
-  const t = translations?.service;
+  const t: Translations["service"] | undefined = translations?.service;
 
   const [form] = Form.useForm();
   const [users, setUsers] = useState<User[]>([]);
@@ -32,22 +33,18 @@ export default function AddServicePage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await UserService.getAllUsers({
-          page: 1,
-          pageSize: 100,
-        });
-
-        setUsers(res.data.filter((user: User) => user.roleId === 3));
-      } catch {
-        notification.error({
-          title: "Failed to load staff data",
-        });
+        const res = await UserService.getAllUsers({});
+        setUsers(res.data || []);
+      } catch (error) {
+        console.error(error);
+        notification.error({ title: t?.ErrorLoadUser });
       }
     };
 
     fetchUsers();
   }, []);
 
+  // Form submit handler
   const handleFormSubmit = async (
     values: AddServiceFormValues & { estimated_time?: Moment | null }
   ) => {
@@ -56,6 +53,7 @@ export default function AddServicePage() {
     try {
       const payload: AddServiceFormValues = {
         ...values,
+        code: values.code,
         estimated_time: values.estimated_time
           ? values.estimated_time.format("HH:mm:ss")
           : undefined,
@@ -64,15 +62,11 @@ export default function AddServicePage() {
 
       await ServiceService.addService(payload);
 
-      notification.success({
-        title:"Service added successfully",
-      });
-
+      notification.success({ title: t?.SuccessAddService });
       router.push("/layanan");
-    } catch {
-      notification.error({
-        title:  "Failed to add service",
-      });
+    } catch (error) {
+      console.error(error);
+      notification.error({ title: t?.ErrorAddService });
     } finally {
       setIsSubmitting(false);
     }
@@ -90,14 +84,12 @@ export default function AddServicePage() {
     <div>
       <Breadcrumbs
         items={[
-          { label: t?.page.ListService ?? "Services", href: "/layanan" },
-          { label: t?.page.AddLayanan ?? "Add Service", href: "/layanan/add" },
+          { label: t?.Services ?? "", href: "/admin/layanan" },
+          { label: t?.AddService ?? "", href: "/admin/layanan/add" },
         ]}
       />
 
-      <h2 className="text-3xl font-semibold mb-4 mt-5">
-        {t?.page.AddLayanan}
-      </h2>
+      <h2 className="text-3xl font-semibold mb-4 mt-5">{t?.AddService}</h2>
 
       <Form
         form={form}
@@ -107,46 +99,30 @@ export default function AddServicePage() {
         className="space-y-6"
       >
         <Form.Item
-          label={t?.AddService.Name}
+          label={t?.ServiceName}
           name="name"
-          rules={[
-            {
-              required: true,
-              message: `${t?.AddService.Name} is required`,
-            },
-          ]}
+          rules={[{ required: true, message: t?.ServiceNameRequired }]}
         >
-          <Input placeholder={t?.AddService.Name} />
+          <Input placeholder={t?.ServiceNamePlaceholder} />
         </Form.Item>
 
         <Form.Item
-          label={t?.AddService.ServiceCode}
+          label={t?.ServiceCode}
           name="code"
-          rules={[
-            {
-              required: true,
-              message: `${t?.AddService.ServiceCode} is required`,
-            },
-          ]}
+          rules={[{ required: true, message: t?.ServiceCodeRequired }]}
         >
-          <Input placeholder={t?.AddService.ServiceCode} />
+          <Input placeholder={t?.ServiceNamePlaceholder} />
         </Form.Item>
 
-        <Form.Item
-          label={t?.AddService.Description}
-          name="description"
-        >
-          <Input.TextArea placeholder={t?.AddService.Description} />
+        <Form.Item label={t?.Description} name="description">
+          <Input.TextArea placeholder={t?.DescriptionPlaceholder} />
         </Form.Item>
 
-        <Form.Item
-          label={t?.AddService.AssignStaf}
-          name="assigned_user_ids"
-        >
+        <Form.Item label={t?.AssignStaff} name="assigned_user_ids">
           <Select
             mode="multiple"
             showSearch
-            placeholder={t?.AddService.AssignStaf}
+            placeholder={t?.AssignStaffPlaceholder}
             optionFilterProp="label"
             filterOption={(input, option) =>
               (option?.label ?? "")
@@ -160,11 +136,12 @@ export default function AddServicePage() {
           />
         </Form.Item>
 
-        <Form.Item
-          label={t?.AddService.EstimatedTime}
-          name="estimated_time"
-        >
+        <Form.Item label={t?.EstimatedTime} name="estimated_time">
           <TimePicker format="HH:mm:ss" />
+        </Form.Item>
+
+        <Form.Item label={t?.IsActive} name="is_active" valuePropName="checked">
+          <Switch />
         </Form.Item>
 
         <Form.Item className="flex justify-end">
@@ -174,7 +151,7 @@ export default function AddServicePage() {
             icon={<SaveOutlined />}
             loading={isSubmitting}
           >
-            {t?.AddService.Save}
+            {t?.Save}
           </Button>
         </Form.Item>
       </Form>

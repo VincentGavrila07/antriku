@@ -1,6 +1,6 @@
 "use client";
 
-import { useLanguage } from "@/app/languange-context";
+import { Translations, useLanguage } from "@/app/languange-context";
 import { Spin, Input, notification, Button } from "antd";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -17,14 +17,13 @@ import TableService from "@/app/Tables/table-service";
 export default function ServiceManagementPage() {
   const router = useRouter();
   const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["service"] | undefined = translations?.service;
   const { permissions, loading: permissionLoading } = usePermission();
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchText, setSearchText] = useState("");
   const debouncedSearch = useDebounce(searchText, 1500);
-
-  const t = translations?.service;
 
   const {
     data: services,
@@ -43,7 +42,10 @@ export default function ServiceManagementPage() {
   });
 
   useEffect(() => {
-    if (!permissionLoading && !permissions.includes("view-Service-management")) {
+    if (
+      !permissionLoading &&
+      !permissions.includes("view-Service-management")
+    ) {
       router.replace("/forbidden");
     }
   }, [permissions, permissionLoading, router]);
@@ -65,30 +67,41 @@ export default function ServiceManagementPage() {
     );
   }
 
-  const handleDeleteService = async (serviceId: string) => {
+  if (errorServices) {
+    notification.error({
+      title: t?.ErrorLoadServiceTitle,
+      description: t?.ErrorLoadServiceDesc,
+    });
+  }
+
+  const handleDeleteService = async (userId: string) => {
+    console.log("Attempting to delete Service:", userId);
     try {
       await ServiceService.deleteService(
-        serviceId,
+        userId,
         localStorage.getItem("token") || ""
       );
+
       refetch();
-      notification.success({ title: "Service berhasil dihapus" });
-    } catch {
+
+      notification.success({ title: t?.SuccessDeleteService });
+    } catch (error) {
+      console.error("Delete failed:", error);
       notification.error({
-        title: "Gagal Menghapus Service",
-        description: "Terjadi kesalahan saat menghapus Service",
+        title: t?.ErrorDeleteServiceTitle,
+        description: t?.ErrorDeleteServiceDesc,
       });
     }
   };
 
   const handleDeleteConfirmation = (serviceId: string) => {
     Swal.fire({
-      title: "Konfirmasi Hapus Service",
-      text: "Apakah Anda yakin ingin menghapus Service ini?",
+      title: t?.DeleteServiceConfirmTitle,
+      text: t?.DeleteServiceConfirmText,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Hapus",
-      cancelButtonText: "Batal",
+      confirmButtonText: t?.DeleteServiceConfirmOk,
+      cancelButtonText: t?.DeleteServiceConfirmCancel,
     }).then((result) => {
       if (result.isConfirmed) {
         handleDeleteService(serviceId);
@@ -99,31 +112,24 @@ export default function ServiceManagementPage() {
   return (
     <div>
       <Breadcrumbs
-        items={[
-          {
-            label: t?.page.ListService || "List Service",
-            href: "/layanan",
-          },
-        ]}
+        items={[{ label: t?.Services ?? "", href: "/admin/layanan" }]}
       />
 
-      <h2 className="text-3xl font-semibold mb-4 mt-5">
-        {t?.page.ListService}
-      </h2>
+      <h2 className="text-3xl font-semibold mb-4 mt-5">{t?.ListService}</h2>
 
       <div className="flex justify-end items-center mt-4 mb-6 gap-5">
         <Input
-          placeholder="Search by name..."
+          placeholder={t?.SearchByNameService}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          className="w-80 max-w-xs"
+          className="w-80 max-w-xs mr-4"
         />
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => router.push("/layanan/add")}
         >
-          {t?.page.AddLayanan}
+          {t?.AddServiceButton}
         </Button>
       </div>
 

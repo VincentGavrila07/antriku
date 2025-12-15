@@ -1,7 +1,16 @@
 "use client";
 
-import { useLanguage } from "@/app/languange-context";
-import { Spin, Form, Input, Button, Select, TimePicker, Switch, notification } from "antd";
+import { Translations, useLanguage } from "@/app/languange-context";
+import {
+  Spin,
+  Form,
+  Input,
+  Button,
+  Select,
+  TimePicker,
+  Switch,
+  notification,
+} from "antd";
 import { Moment } from "moment";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -18,6 +27,7 @@ export default function EditServicePage() {
   const id = params?.id as string;
 
   const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["service"] | undefined = translations?.service;
   const [form] = Form.useForm();
   const [users, setUsers] = useState<{ id: number; name: string }[]>([]);
   const [service, setService] = useState<Service | null>(null);
@@ -31,7 +41,7 @@ export default function EditServicePage() {
         setUsers(res.data || []);
       } catch (error) {
         console.error(error);
-        notification.error({ title: "Gagal memuat data user" });
+        notification.error({ title: t?.ErrorLoadUser });
       }
     };
     fetchUsers();
@@ -44,7 +54,7 @@ export default function EditServicePage() {
         setService(res.data);
       } catch (error) {
         console.error(error);
-        notification.error({ title: "Gagal memuat data service" });
+        notification.error({ title: t?.ErrorLoadService });
       }
     };
     fetchService();
@@ -59,29 +69,36 @@ export default function EditServicePage() {
       description: service.description,
       assigned_user_ids: service.assigned_user_ids || [],
       is_active: service.is_active,
-      estimated_time: service.estimated_time ? moment(service.estimated_time, "HH:mm:ss") : null,
+      estimated_time: service.estimated_time
+        ? moment(service.estimated_time, "HH:mm:ss")
+        : null,
     });
   }, [service, form]);
 
   const handleFormSubmit = async (
-    values: AddServiceFormValues & { estimated_time?: Moment | null; is_active?: boolean }
+    values: AddServiceFormValues & {
+      estimated_time?: Moment | null;
+      is_active?: boolean;
+    }
   ) => {
     setIsSubmitting(true);
     try {
       const payload: AddServiceFormValues & { is_active: boolean } = {
         ...values,
         assigned_user_ids: values.assigned_user_ids ?? [],
-        estimated_time: values.estimated_time ? values.estimated_time.format("HH:mm:ss") : null,
+        estimated_time: values.estimated_time
+          ? values.estimated_time.format("HH:mm:ss")
+          : null,
         is_active: values.is_active ?? true,
       };
 
       await ServiceService.updateService(id, payload);
 
-      notification.success({ title: "Service berhasil diperbarui" });
+      notification.success({ title: t?.SuccessEditService });
       router.push("/layanan");
     } catch (error) {
       console.error(error);
-      notification.error({ title: "Gagal memperbarui service" });
+      notification.error({ title: t?.ErrorEditService });
     } finally {
       setIsSubmitting(false);
     }
@@ -99,12 +116,15 @@ export default function EditServicePage() {
     <div>
       <Breadcrumbs
         items={[
-          { label: "Services", href: "/layanan" },
-          { label: "Edit Service", href: `/layanan/edit/${id}` },
+          { label: t?.Services ?? "Services", href: "/admin/layanan" },
+          {
+            label: t?.EditService ?? "Edit Service",
+            href: `/admin/layanan/edit/${id}`,
+          },
         ]}
       />
 
-      <h2 className="text-3xl font-semibold mb-4 mt-5">{t?.page.EditService}</h2>
+      <h2 className="text-3xl font-semibold mb-4 mt-5">{t?.EditService}</h2>
 
       <Form
         form={form}
@@ -113,40 +133,47 @@ export default function EditServicePage() {
         className="space-y-6"
       >
         <Form.Item
-          label={t?.AddService.Name}
+          label={t?.ServiceName}
           name="name"
-          rules={[{ required: true, message: "Nama service harus diisi" }]}
+          rules={[{ required: true, message: t?.ServiceNameRequired }]}
         >
-          <Input placeholder="Masukkan nama service" />
+          <Input placeholder={t?.ServiceNamePlaceholder} />
         </Form.Item>
 
         <Form.Item
-          label={t?.AddService.ServiceCode}
+          label={t?.ServiceCode}
           name="code"
-          rules={[{ required: true, message: "Kode Service harus diisi" }]}
+          rules={[{ required: true, message: t?.ServiceCodeRequired }]}
         >
-          <Input placeholder="Masukkan kode service" />
+          <Input placeholder={t?.ServiceCodePlaceholder} />
         </Form.Item>
 
-        <Form.Item label={t?.AddService.Description} name="description">
-          <Input.TextArea placeholder="Deskripsi service" />
+        <Form.Item label={t?.Description} name="description">
+          <Input.TextArea placeholder={t?.DescriptionPlaceholder} />
         </Form.Item>
 
-        <Form.Item label={t?.AddService.AssignStaf} name="assigned_user_ids">
+        <Form.Item label={t?.AssignStaff} name="assigned_user_ids">
           <Select
             mode="multiple"
             showSearch
-            placeholder="Pilih staff"
+            placeholder={t?.AssignStaffEditPlaceholder}
             optionFilterProp="label"
             filterOption={(input, option) =>
               (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
             }
-            options={users.map((user) => ({ value: user.id, label: user.name }))}
+            options={users.map((user) => ({
+              value: user.id,
+              label: user.name,
+            }))}
           />
         </Form.Item>
 
-        <Form.Item label={t?.AddService.EstimatedTime} name="estimated_time">
+        <Form.Item label={t?.EstimatedTime} name="estimated_time">
           <TimePicker format="HH:mm:ss" />
+        </Form.Item>
+
+        <Form.Item label={t?.IsActive} name="is_active" valuePropName="checked">
+          <Switch />
         </Form.Item>
 
         <Form.Item className="flex justify-end">
@@ -156,7 +183,7 @@ export default function EditServicePage() {
             icon={<SaveOutlined />}
             loading={isSubmitting}
           >
-            {t?.AddService.Save}
+            {t?.Save}
           </Button>
         </Form.Item>
       </Form>

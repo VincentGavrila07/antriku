@@ -39,6 +39,7 @@ export default function Sidebar({ roleId }: SidebarProps) {
   }
 
   const t = translations.Sidebar;
+  const { lang, changeLanguage } = useLanguage();
 
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
@@ -155,6 +156,28 @@ export default function Sidebar({ roleId }: SidebarProps) {
           />
         </div>
 
+        <button
+          onClick={() => changeLanguage("en")}
+          className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-300 transform ${
+            lang === "en"
+              ? "bg-blue-600 text-blue-700 shadow-md scale-105"
+              : "text-blue-100 hover:text-white hover:bg-blue-700/50"
+          }`}
+        >
+          EN
+        </button>
+
+        <button
+          onClick={() => changeLanguage("id")}
+          className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-300 transform ${
+            lang === "id"
+              ? "bg-blue-600 text-blue-700 shadow-md scale-105"
+              : "text-blue-100 hover:text-white hover:bg-blue-700/50"
+          }`}
+        >
+          ID
+        </button>
+        
         <Button
           onClick={handleLogout}
           type="primary"
