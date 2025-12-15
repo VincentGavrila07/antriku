@@ -58,7 +58,7 @@ export default function AddRolePage() {
       <Breadcrumbs
         items={[
           { label: t.RoleName, href: "/user-management/role" },
-          { label: t.AddRole, href: "/admin/user-management/role/add" },
+          { label: t.AddRole, href: "i/user-management/role/add" },
         ]}
       />
 

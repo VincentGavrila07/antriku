@@ -62,7 +62,7 @@ export default function UserDetailPage() {
     return (
       <div>
         <Breadcrumbs
-          items={[{ label: t.ListUser, href: "/admin/user-management/user" }]}
+          items={[{ label: t.ListUser, href: "/user-management/user" }]}
         />
         <h1>{t.ErrorLoadUser}</h1>
       </div>

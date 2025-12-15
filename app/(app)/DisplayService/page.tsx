@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import DisplayService from "@/services/DisplayService";
 import { DisplayServiceType } from "@/types/Display";
 import { ClockCircleOutlined, UserOutlined } from "@ant-design/icons";
+import { Translations, useLanguage } from "@/app/languange-context";
 
 const { Title, Text } = Typography;
 const { useToken } = theme;
@@ -39,6 +40,8 @@ const nextBoxStyle = (token: GlobalToken) => ({
 
 export default function DisplayTVPage() {
   const { token } = useToken();
+  const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["display"] | undefined = translations?.display;
 
   const { data, isLoading } = useQuery<{ data: DisplayServiceType[] }, Error>({
     queryKey: ["displayServices"],
@@ -49,7 +52,13 @@ export default function DisplayTVPage() {
   const services: DisplayServiceType[] = data?.data ?? [];
 
   return (
-    <div style={{ padding: 40, background: token.colorBgLayout, minHeight: "100vh" }}>
+    <div
+      style={{
+        padding: 40,
+        background: token.colorBgLayout,
+        minHeight: "100vh",
+      }}
+    >
       <Title
         level={1}
         style={{
@@ -61,21 +70,26 @@ export default function DisplayTVPage() {
         }}
       >
         <ClockCircleOutlined style={{ marginRight: 15 }} />
-        Display Antrian Layanan
+        {t?.title}
       </Title>
 
       {isLoading ? (
         <div style={{ textAlign: "center", marginTop: 150 }}>
-          <Spin size="large" tip={<Text style={{ color: token.colorPrimary }}>Memuat Data...</Text>} />
+          <Spin size="large" />
+          <div style={{ marginTop: 16 }}>
+            <Text style={{ color: token.colorPrimary }}>{t?.loading}</Text>
+          </div>
         </div>
       ) : (
         <Row gutter={[32, 32]} justify="center">
           {services.map((service) => (
             <Col xs={24} sm={12} md={8} lg={6} key={service.service_id}>
               <Card
-                bordered={false}
-                styles={serviceCardStyle(token)}
-                bodyStyle={{ padding: 0 }}
+                variant="borderless"
+                styles={{
+                  ...serviceCardStyle(token),
+                  body: { padding: 0 },
+                }}
               >
                 <div
                   style={{
@@ -85,7 +99,10 @@ export default function DisplayTVPage() {
                     borderTopRightRadius: 20,
                   }}
                 >
-                  <Text strong style={{ fontSize: 24, color: token.colorPrimary }}>
+                  <Text
+                    strong
+                    style={{ fontSize: 24, color: token.colorPrimary }}
+                  >
                     {service.service_name}
                   </Text>
                   <br />
@@ -101,43 +118,72 @@ export default function DisplayTVPage() {
                     style={{ width: "100%" }}
                   >
                     <div style={nowBoxStyle(token)}>
-                      <Text strong style={{ fontSize: 18, color: token.colorWarning }}>
-                        SEDANG DIPANGGIL:
+                      <Text
+                        strong
+                        style={{ fontSize: 18, color: token.colorWarning }}
+                      >
+                        {t?.nowServing}
                       </Text>
                       <br />
                       {service.current_queue ? (
                         <>
                           <Title
                             level={1}
-                            style={{ margin: "10px 0", color: token.colorWarningText, fontWeight: 900, fontSize: "4rem" }}
+                            style={{
+                              margin: "10px 0",
+                              color: token.colorWarningText,
+                              fontWeight: 900,
+                              fontSize: "4rem",
+                            }}
                           >
                             {service.current_queue.queue_number}
                           </Title>
-                          <Text style={{ fontSize: 16, color: token.colorText }}>
+                          <Text
+                            style={{ fontSize: 16, color: token.colorText }}
+                          >
                             {service.current_queue.customer_name}
                           </Text>
                         </>
                       ) : (
-                        <Text style={{ fontSize: 28, fontWeight: 700 }}>-</Text>
+                        <Text style={{ fontSize: 28, fontWeight: 700 }}>
+                          {t?.dash}
+                        </Text>
                       )}
                     </div>
 
                     <div style={nextBoxStyle(token)}>
-                      <Text strong style={{ fontSize: 18, color: token.colorInfo }}>
-                        BERIKUTNYA:
+                      <Text
+                        strong
+                        style={{ fontSize: 18, color: token.colorInfo }}
+                      >
+                        {t?.next}
                       </Text>
                       <br />
                       {service.next_queue ? (
                         <>
-                          <Title level={3} style={{ margin: "8px 0", color: token.colorInfoText, fontWeight: 700 }}>
+                          <Title
+                            level={3}
+                            style={{
+                              margin: "8px 0",
+                              color: token.colorInfoText,
+                              fontWeight: 700,
+                            }}
+                          >
                             {service.next_queue.queue_number}
                           </Title>
-                          <Text style={{ fontSize: 14, color: token.colorTextSecondary }}>
+                          <Text
+                            style={{
+                              fontSize: 14,
+                              color: token.colorTextSecondary,
+                            }}
+                          >
                             {service.next_queue.customer_name}
                           </Text>
                         </>
                       ) : (
-                        <Text style={{ fontSize: 18, fontWeight: 600 }}>-</Text>
+                        <Text style={{ fontSize: 18, fontWeight: 600 }}>
+                          {t?.dash}
+                        </Text>
                       )}
                     </div>
                   </Space>

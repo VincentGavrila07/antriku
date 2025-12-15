@@ -112,7 +112,7 @@ export default function ServiceManagementPage() {
   return (
     <div>
       <Breadcrumbs
-        items={[{ label: t?.Services ?? "", href: "/admin/layanan" }]}
+        items={[{ label: t?.Services ?? "", href: "/layanan" }]}
       />
 
       <h2 className="text-3xl font-semibold mb-4 mt-5">{t?.ListService}</h2>

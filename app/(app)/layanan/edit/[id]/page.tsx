@@ -115,10 +115,10 @@ export default function EditServicePage() {
     <div>
       <Breadcrumbs
         items={[
-          { label: t?.Services ?? "Services", href: "/admin/layanan" },
+          { label: t?.Services ?? "Services", href: "/layanan" },
           {
             label: t?.EditService ?? "Edit Service",
-            href: `/admin/layanan/edit/${id}`,
+            href: `/layanan/edit/${id}`,
           },
         ]}
       />
