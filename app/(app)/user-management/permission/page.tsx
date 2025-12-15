@@ -64,7 +64,7 @@ export default function PermissionManagementPage() {
         items={[
           {
             label: t.PermissionInfo,
-            href: "/admin/user-management/permission",
+            href: "m/user-management/permission",
           },
         ]}
       />

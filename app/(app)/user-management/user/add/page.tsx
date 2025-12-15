@@ -84,7 +84,7 @@ export default function AddUserPage() {
       <Breadcrumbs
         items={[
           { label: t.ListUser, href: "/user-management/user" },
-          { label: t.AddUser, href: "/admin/user-management/user/add" },
+          { label: t.AddUser, href: "/user-management/user/add" },
         ]}
       />
 

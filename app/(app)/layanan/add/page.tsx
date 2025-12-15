@@ -51,14 +51,15 @@ export default function AddServicePage() {
     setIsSubmitting(true);
 
     try {
-      const payload: AddServiceFormValues = {
+      // Build payload without null for estimated_time
+      const payload: any = {
         ...values,
         code: values.code,
-        estimated_time: values.estimated_time
-          ? values.estimated_time.format("HH:mm:ss")
-          : undefined,
         assigned_user_ids: values.assigned_user_ids ?? [],
       };
+      if (values.estimated_time) {
+        payload.estimated_time = values.estimated_time.format("HH:mm:ss");
+      }
 
       await ServiceService.addService(payload);
 
@@ -84,8 +85,8 @@ export default function AddServicePage() {
     <div>
       <Breadcrumbs
         items={[
-          { label: t?.Services ?? "", href: "/admin/layanan" },
-          { label: t?.AddService ?? "", href: "/admin/layanan/add" },
+          { label: t?.Services ?? "", href: "/layanan" },
+          { label: t?.AddService ?? "", href: "/layanan/add" },
         ]}
       />
 
@@ -125,9 +126,7 @@ export default function AddServicePage() {
             placeholder={t?.AssignStaffPlaceholder}
             optionFilterProp="label"
             filterOption={(input, option) =>
-              (option?.label ?? "")
-                .toLowerCase()
-                .includes(input.toLowerCase())
+              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
             }
             options={users.map((user) => ({
               value: user.id,

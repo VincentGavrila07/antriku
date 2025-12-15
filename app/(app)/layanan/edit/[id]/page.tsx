@@ -32,7 +32,7 @@ export default function EditServicePage() {
   const [users, setUsers] = useState<{ id: number; name: string }[]>([]);
   const [service, setService] = useState<Service | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const t = translations?.service;
+
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -116,10 +116,10 @@ export default function EditServicePage() {
     <div>
       <Breadcrumbs
         items={[
-          { label: t?.Services ?? "Services", href: "/admin/layanan" },
+          { label: t?.Services ?? "Services", href: "/layanan" },
           {
             label: t?.EditService ?? "Edit Service",
-            href: `/admin/layanan/edit/${id}`,
+            href: `/layanan/edit/${id}`,
           },
         ]}
       />

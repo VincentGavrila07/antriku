@@ -120,7 +120,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
         setTodayQueues(totalServeToday);
         setServices(serviceRes.data);
       } catch (err) {
-        console.error("Gagal memuat dashboard", err);
+        console.error(t?.ErrorLoadDashboard || "Gagal memuat dashboard", err);
       } finally {
         setLoadingStats(false);
         setTableLoading(false);
@@ -193,7 +193,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
         setTodayQueues(totalServeToday);
         setServices(serviceRes.data);
       } catch (err) {
-        console.error("Gagal memuat dashboard", err);
+        console.error(t?.ErrorLoadDashboard || "Gagal memuat dashboard", err);
       } finally {
         setLoadingStats(false);
         setTableLoading(false);
@@ -220,17 +220,20 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
   return (
     <div className="min-h-screen bg-gray-50 p-6 pb-20">
       <div className="max-w-[1400px] mx-auto space-y-6">
-
         {/* HEADER */}
         <div className="flex justify-between bg-white p-6 rounded-2xl shadow-sm">
           <div className="flex items-center gap-4">
-            <Avatar size={64} icon={<SettingOutlined />} className="bg-blue-900" />
+            <Avatar
+              size={64}
+              icon={<SettingOutlined />}
+              className="bg-blue-900"
+            />
             <div>
               <Title level={3} className="m-0">
-                {translations.Sidebar?.adminDashboard || "Admin Dashboard"}
+                {t?.AdminDashboard || "Admin Dashboard"}
               </Title>
               <Text>
-                Selamat Datang, <b>{user.name}</b>
+                {t?.Welcome}, <b>{user.name}</b>
               </Text>
             </div>
           </div>
@@ -242,28 +245,40 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
           <Col xs={24} sm={12} lg={6}>
             <Card>
               <TeamOutlined className="text-blue-600 text-2xl mb-2" />
-              <Statistic title="Total Pasien" value={totalPatients} />
+              <Statistic
+                title={t?.TotalPatients || "Total Pasien"}
+                value={totalPatients}
+              />
             </Card>
           </Col>
 
           <Col xs={24} sm={12} lg={6}>
             <Card>
               <MedicineBoxOutlined className="text-teal-600 text-2xl mb-2" />
-              <Statistic title="Total Staff" value={totalStaff} />
+              <Statistic
+                title={t?.TotalStaff || "Total Staff"}
+                value={totalStaff}
+              />
             </Card>
           </Col>
 
           <Col xs={24} sm={12} lg={6}>
             <Card>
               <NumberOutlined className="text-orange-600 text-2xl mb-2" />
-              <Statistic title="Antrian Hari Ini" value={todayQueues} />
+              <Statistic
+                title={t?.TodayQueues || "Antrian Hari Ini"}
+                value={todayQueues}
+              />
             </Card>
           </Col>
 
           <Col xs={24} sm={12} lg={6}>
             <Card>
               <DatabaseOutlined className="text-purple-600 text-2xl mb-2" />
-              <Statistic title="Layanan Aktif" value={activeServices} />
+              <Statistic
+                title={t?.ActiveServices || "Layanan Aktif"}
+                value={activeServices}
+              />
               <Progress percent={100} showInfo={false} size="small" />
             </Card>
           </Col>
@@ -271,10 +286,10 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
 
         {/* TABLE */}
         <Card
-          title="Daftar Layanan"
+          title={t?.ServiceList || "Daftar Layanan"}
           extra={
             <Input
-              placeholder="Cari layanan"
+              placeholder={t?.SearchServiceOrStaff || "Cari layanan"}
               prefix={<SearchOutlined />}
               allowClear
               onChange={(e) => setSearchText(e.target.value)}
@@ -288,22 +303,22 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
             pagination={{ pageSize: 5 }}
             columns={[
               {
-                title: "Kode",
+                title: t?.ServiceCode || "Kode",
                 dataIndex: "code",
                 width: 120,
               },
               {
-                title: "Layanan",
+                title: t?.ServiceName || "Layanan",
                 dataIndex: "name",
               },
               {
-                title: "Staff",
+                title: t?.Staff || "Staff",
                 dataIndex: "assigned_user_ids",
                 render: (ids?: number[]) => {
                   if (!ids || ids.length === 0) {
                     return (
                       <Tag color="default">
-                        Belum di-assign
+                        {t?.NotAssigned || "Belum di-assign"}
                       </Tag>
                     );
                   }
@@ -311,9 +326,9 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
                   return (
                     <div className="flex flex-wrap gap-1">
                       {ids.map((id) => (
-                        <Tooltip key={id} title="Staff">
+                        <Tooltip key={id} title={t?.Staff || "Staff"}>
                           <Tag icon={<UserOutlined />} color="blue">
-                            {staffMap[id] ?? "Unknown"}
+                            {staffMap[id] ?? (t?.Unknown || "Unknown")}
                           </Tag>
                         </Tooltip>
                       ))}

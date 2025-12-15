@@ -18,46 +18,46 @@ export interface Translations {
     profile: string;
     logout: string;
   };
-  Forbidden:{
-    Forbidden:string;
-    Sorry:string;
-  },
-  welcome:{
-    welcome:string;
-  },
+  Forbidden: {
+    Forbidden: string;
+    Sorry: string;
+  };
+  welcome: {
+    welcome: string;
+  };
   userManagement: {
     // General
     ListUser: string;
     ListPermission: string;
-  profile:{
-    EditProfile:string;
-    changePass:string;
-    name:string;
-    NewPass:string;
-    ConfirmPass:string;
-    Save:string;
-  },
-  report : {
-    GenerateServiceReport : string;
-    GenerateReport : string;
-    Keterangan:string;
-    OpenManually : string;
-  },
-  service: {
-    page: {
-      ListService: string;
-      AddLayanan: string;
-      EditService:string;
-    };
-    AddService: {
-      Name: string;
-      ServiceCode: string;
-      Description: string;
-      AssignStaf: string;
-      EstimatedTime: string;
+    profile: {
+      EditProfile: string;
+      changePass: string;
+      name: string;
+      NewPass: string;
+      ConfirmPass: string;
       Save: string;
     };
-  };
+    report: {
+      GenerateServiceReport: string;
+      GenerateReport: string;
+      Keterangan: string;
+      OpenManually: string;
+    };
+    service: {
+      page: {
+        ListService: string;
+        AddLayanan: string;
+        EditService: string;
+      };
+      AddService: {
+        Name: string;
+        ServiceCode: string;
+        Description: string;
+        AssignStaf: string;
+        EstimatedTime: string;
+        Save: string;
+      };
+    };
     ListRole: string;
     EditPermission: string;
     PermissionInfo: string;
@@ -150,6 +150,7 @@ export interface Translations {
     QueueDate: string;
   };
   dashboard: {
+    ErrorLoadDashboard: string;
     Loading: string;
     AdminDashboard: string;
     Welcome: string;
@@ -213,6 +214,9 @@ export interface Translations {
     MonthlyMeeting: string;
     NewNotePlaceholder: string;
     CheckIn: string;
+    NotAssigned: string;
+    ServiceCode: string;
+    Unknown: string;
   };
   service: {
     Services: string;
@@ -282,9 +286,7 @@ export interface Translations {
     OpenManually: string;
     HelperText: string;
   };
-  tables: {
-
-  };
+  tables: {};
 }
 
 interface LanguageContextType {

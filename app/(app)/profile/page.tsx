@@ -28,7 +28,6 @@ export default function EditProfilePage() {
     enabled: !!token,
   });
   
-  const t = translations?.profile;
 
   useEffect(() => {
     if (loggedInUser) {

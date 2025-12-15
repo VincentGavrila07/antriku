@@ -96,7 +96,7 @@ export default function UserManagementPage() {
   return (
     <div>
       <Breadcrumbs
-        items={[{ label: "User", href: "/admin/user-management/user" }]}
+        items={[{ label: "User", href: "/user-management/user" }]}
       />
 
       <h2 className="text-3xl font-semibold mb-4 mt-5">{t.ListUser}</h2>

@@ -85,7 +85,7 @@ export default function ServiceHistoryPage() {
     <div>
       <Breadcrumbs
         items={[
-          { label: t?.Service || "Service", href: "/admin/service-history" },
+          { label: t?.Service || "Service", href: "/service-history" },
         ]}
       />
 

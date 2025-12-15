@@ -90,7 +90,7 @@ export default function RoleManagementPage() {
   return (
     <div>
       <Breadcrumbs
-        items={[{ label: t.RoleName, href: "/admin/user-management/role" }]}
+        items={[{ label: t.RoleName, href: "/user-management/role" }]}
       />
 
       <h2 className="text-3xl font-semibold mb-4 mt-5">{t.ListRole}</h2>
