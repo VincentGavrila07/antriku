@@ -295,7 +295,6 @@ export interface Translations {
     OpenManually: string;
     HelperText: string;
   };
-  tables: {};
 }
 
 interface LanguageContextType {
