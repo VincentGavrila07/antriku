@@ -5,7 +5,6 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const BeritaService = {
 
-  // 🔹 tanpa pagination (buat carousel / public)
   getAllBerita: async (): Promise<{ data: Berita[] }> => {
     const token = localStorage.getItem("token");
 
@@ -19,7 +18,6 @@ const BeritaService = {
     return response.data;
   },
 
-  // 🔹 pagination (buat admin table)
   getAllBeritaPagination: async (params: {
     page: number;
     pageSize: number;

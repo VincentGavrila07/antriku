@@ -13,6 +13,7 @@ import {
   Button,
   Avatar,
   Badge,
+  Carousel,
 } from "antd";
 import {
   ClockCircleOutlined,
@@ -25,6 +26,7 @@ import { useQuery } from "@tanstack/react-query";
 import UserService from "@/services/UserService";
 import { User } from "@/types/User";
 import ServiceService from "@/services/ServiceService";
+import BeritaService from "@/services/BeritaService";
 import { useRouter } from "next/navigation";
 
 const { Title, Text } = Typography;
@@ -68,6 +70,7 @@ interface CustomerDashboardProps {
 export default function CustomerDashboard(props: CustomerDashboardProps) {
   const { translations, loading: langLoading } = useLanguage();
   const t: Translations["dashboard"] | undefined = translations?.dashboard;
+  const ta: Translations["berita"] | undefined = translations?.berita;
   const router = useRouter();
 
   const token =
@@ -97,6 +100,11 @@ export default function CustomerDashboard(props: CustomerDashboardProps) {
       const res = await ServiceService.getAllService({ page: 1, pageSize: 50 });
       return res.data;
     },
+  });
+
+  const { data: berita, isLoading: beritaLoading } = useQuery({
+    queryKey: ["berita"],
+    queryFn: () => BeritaService.getAllBerita(),
   });
 
   if (langLoading || userLoading || !t) {
@@ -292,27 +300,41 @@ export default function CustomerDashboard(props: CustomerDashboardProps) {
             </Text>
             <Card
               className={CARD_HEIGHT_CLASS}
-              styles={{ body: { padding: 0, height: "100%" } }}
+              bodyStyle={{ padding: 0, height: "100%" }}
             >
-              <div className="h-[250px] lg:h-full relative group cursor-pointer">
-                <div className="absolute inset-0 bg-linear-to-t from-gray-900 via-gray-900/40 to-transparent z-10 opacity-90"></div>
-                <img
-                  src="https://img.freepik.com/free-photo/doctor-nurses-special-equipment_23-2148980721.jpg"
-                  alt="Info Banner"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute bottom-0 left-0 p-6 z-20 text-white w-full">
-                  <Tag className="bg-blue-600 border-none text-white px-2 py-0.5 mb-3 text-[10px] font-bold rounded">
-                    {t.Latest}
-                  </Tag>
-                  <h3 className="text-lg md:text-xl font-bold leading-tight mb-2 group-hover:text-blue-200 transition-colors">
-                    {t.RainySeasonHealth}
-                  </h3>
-                  <p className="text-xs md:text-sm text-gray-300 line-clamp-2 leading-relaxed">
-                    {t.ImmunityTips}
-                  </p>
+              {beritaLoading ? (
+                <div className="flex justify-center items-center h-full">
+                  <Spin size="large" />
                 </div>
-              </div>
+              ) : berita?.data?.length ? (
+                <Carousel autoplay dotPosition="bottom">
+                  {berita.data.map((item) => (
+                    <div key={item.id} className="relative h-[250px] lg:h-[360px] overflow-hidden">
+                      <img
+                        src={item.foto || "https://via.placeholder.com/800x400"}
+                        alt={item.judul}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-gray-900/80 to-transparent text-white">
+                        <Tag className="bg-blue-600 border-none text-white px-2 py-0.5 mb-2 text-[10px] font-bold rounded">
+                          {item.published_at}
+                        </Tag>
+                        <Title level={4} className="text-white m-0">
+                          {item.judul}
+                        </Title>
+                        <p className="text-xs md:text-sm line-clamp-2">{item.deskripsi}</p>
+                      </div>
+                    </div>
+                  ))}
+                </Carousel>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-[250px] lg:h-full bg-white text-center p-8">
+                  <SmileOutlined className="text-4xl text-gray-300 mb-4" />
+                  <Title level={4} className="text-gray-400">
+                    {ta?.NoBerita}
+                  </Title>
+                </div>
+              )}
             </Card>
           </Col>
           {/* Profil */}
@@ -352,12 +374,6 @@ export default function CustomerDashboard(props: CustomerDashboardProps) {
                     >
                       {loggedInUser?.name || "Pasien"}
                     </h3>
-                    <Text
-                      type="secondary"
-                      className="text-xs font-medium block mb-1"
-                    >
-                      {t.RegularPatient}
-                    </Text>
                     <Tag
                       color="green"
                       className="border-none bg-green-50 text-green-600 font-bold text-[10px] rounded px-2"
@@ -377,14 +393,6 @@ export default function CustomerDashboard(props: CustomerDashboardProps) {
                       title={loggedInUser?.email}
                     >
                       {loggedInUser?.email || "-"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-3.5 bg-gray-50 rounded-xl hover:bg-blue-50 transition-colors group">
-                    <span className="text-xs text-gray-500 font-bold group-hover:text-blue-600">
-                      {t.PhoneNumber}
-                    </span>
-                    <span className="text-sm font-bold text-gray-800 flex items-center gap-1">
-                      +62 812...
                     </span>
                   </div>
                 </div>

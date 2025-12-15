@@ -340,6 +340,7 @@ export interface Translations {
       // Table
       NoData: string;
       save:string;
+      NoBerita:string;
   };
 }
 

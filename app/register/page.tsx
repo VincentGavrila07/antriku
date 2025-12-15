@@ -100,7 +100,7 @@ const RegisterPage = () => {
               level={2}
               style={{ marginBottom: 0, fontWeight: 700, color: "#1f2937" }}
             >
-              Login
+              Register
             </Title>
           </div>
 
