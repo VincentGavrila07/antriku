@@ -43,7 +43,7 @@ export default function ReportsPage() {
       if (url) {
         window.open(url, "_blank");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       notification.error({
         title: t?.ErrorTitle,

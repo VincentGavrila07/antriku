@@ -162,7 +162,7 @@ const LoginPage = () => {
               </Form.Item>
               <a
                 className="text-blue-600 hover:text-blue-800 font-semibold text-sm"
-                href="/forgot-password"
+                href="/forgot-password" 
               >
                 Forgot Password?
               </a>

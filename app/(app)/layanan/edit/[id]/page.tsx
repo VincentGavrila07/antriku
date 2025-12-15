@@ -32,7 +32,6 @@ export default function EditServicePage() {
   const [users, setUsers] = useState<{ id: number; name: string }[]>([]);
   const [service, setService] = useState<Service | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const t = translations?.service;
 
   useEffect(() => {
     const fetchUsers = async () => {

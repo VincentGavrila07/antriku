@@ -185,7 +185,33 @@ const UserService = {
 
     return response.data;
   },
+  
+  requestPasswordReset: async (email: string) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/forgot-password`, { email });
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(error.response.data.message || 'Permintaan reset gagal.');
+      }
+      throw new Error('Terjadi kesalahan jaringan.');
+    }
+  },
 
+  resetPassword: async (token: string, newPassword: string) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/reset-password`, { 
+        token, 
+        newPassword 
+      });
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(error.response.data.message || 'Reset kata sandi gagal. Tautan mungkin kedaluwarsa.');
+      }
+      throw new Error('Terjadi kesalahan jaringan.');
+    }
+  },
 
 
 };

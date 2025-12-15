@@ -283,7 +283,7 @@ export interface Translations {
     HelperText: string;
   };
   tables: {
-
+    
   };
 }
 

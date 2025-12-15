@@ -39,6 +39,7 @@ export default function Sidebar({ roleId }: SidebarProps) {
   }
 
   const t = translations.Sidebar;
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { lang, changeLanguage } = useLanguage();
 
   const handleLogout = async () => {
@@ -127,6 +128,11 @@ export default function Sidebar({ roleId }: SidebarProps) {
       key: "display",
       icon: <ShoppingCartOutlined />,
       label: <Link href="/DisplayService">Display</Link>,
+    },
+    roleId === 1 && {
+      key: "berita",
+      icon: <ShoppingCartOutlined />,
+      label: <Link href="/berita">Berita</Link>,
     },
   ].filter(Boolean) as MenuProps["items"];
 
