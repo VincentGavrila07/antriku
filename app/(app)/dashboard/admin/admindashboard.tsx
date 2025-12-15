@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, memo } from "react";
+import Reserct, { useState, useEffect, memo } from "react";
 import { User } from "@/types/User";
 import { useLanguage } from "@/app/languange-context";
 import type { Translations } from "@/app/languange-context";

@@ -70,7 +70,7 @@ const RegisterPage = () => {
             style={{ backgroundImage: `url('${bgPath}')` }}
           />
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
 
           <div className="relative z-10 text-center">
             <h2 className="text-3xl font-bold mb-2 text-white drop-shadow-md">

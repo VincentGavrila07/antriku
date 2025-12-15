@@ -1,6 +1,6 @@
 "use client";
 
-import { useLanguage } from "@/app/languange-context";
+import { Translations, useLanguage } from "@/app/languange-context";
 import { Spin, Form, Input, Button, notification, Divider } from "antd";
 import { useState, useEffect } from "react";
 import Breadcrumbs from "@/app/components/breadcrumbs";
@@ -15,6 +15,7 @@ export default function EditProfilePage() {
   const [form] = Form.useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["profile"] | undefined = translations?.profile;
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -35,7 +36,6 @@ export default function EditProfilePage() {
       });
     }
   }, [loggedInUser, form]);
-
 
   const handleFormSubmit = async (values: UpdateUserFormValues) => {
     setIsSubmitting(true);
@@ -59,17 +59,16 @@ export default function EditProfilePage() {
       await UserService.updateProfile(payload, token);
 
       notification.success({
-        title: "Profil berhasil diperbarui",
+        title: t?.SuccessEditProfile,
       });
 
       queryClient.invalidateQueries({ queryKey: ["profile-me"] });
 
-      router.push('/dashboard');
-
+      router.push("/dashboard");
     } catch (error: unknown) {
       notification.error({
-        title: "Gagal memperbarui profil",
-        description: "Terjadi kesalahan saat memperbarui profil.",
+        title: t?.ErrorEditProfile,
+        description: t?.ErrorEditProfileDesc,
       });
     } finally {
       setIsSubmitting(false);
@@ -87,10 +86,15 @@ export default function EditProfilePage() {
   return (
     <div>
       <Breadcrumbs
-        items={[{ label: "My Profile", href: `/profile/${loggedInUser.id}` }]}
+        items={[
+          {
+            label: t?.MyProfile || "My Profile",
+            href: `/profile/${loggedInUser.id ?? ""}`,
+          },
+        ]}
       />
 
-      <h2 className="text-3xl font-semibold mb-4 mt-5">Edit Profile</h2>
+      <h2 className="text-3xl font-semibold mb-4 mt-5">{t?.EditProfile}</h2>
 
       <Form
         form={form}
@@ -99,26 +103,25 @@ export default function EditProfilePage() {
         className="space-y-6"
       >
         <Form.Item
-          label="Nama"
+          label={t?.Name}
           name="name"
-          rules={[{ required: true, message: "Nama user harus diisi" }]}
+          rules={[{ required: true, message: t?.NameRequired }]}
         >
-          <Input placeholder="Masukkan nama user" />
+          <Input placeholder={t?.NamePlaceholder} />
         </Form.Item>
 
-
-        <Divider plain>Ganti Password (Opsional)</Divider>
+        <Divider plain>{t?.ChangePassword}</Divider>
 
         <Form.Item
-          label="Password Baru"
+          label={t?.NewPassword}
           name="newPassword"
-          rules={[{ min: 6, message: "Minimal 6 karakter" }]}
+          rules={[{ min: 6, message: t?.NewPasswordMin }]}
         >
-          <Input.Password placeholder="Kosongkan jika tidak ingin mengganti" />
+          <Input.Password placeholder={t?.NewPasswordPlaceholder} />
         </Form.Item>
 
         <Form.Item
-          label="Konfirmasi Password Saat Ini"
+          label={t?.ConfirmCurrentPassword}
           name="currentPassword"
           dependencies={["newPassword"]}
           rules={[
@@ -126,7 +129,7 @@ export default function EditProfilePage() {
               validator(_, value) {
                 if (!value && getFieldValue("newPassword")) {
                   return Promise.reject(
-                    new Error("Masukkan password lama untuk konfirmasi!")
+                    new Error(t?.ConfirmCurrentPasswordRequired || "")
                   );
                 }
                 return Promise.resolve();
@@ -134,7 +137,7 @@ export default function EditProfilePage() {
             }),
           ]}
         >
-          <Input.Password placeholder="Masukkan password lama Anda" />
+          <Input.Password placeholder={t?.ConfirmCurrentPasswordPlaceholder} />
         </Form.Item>
 
         <Form.Item className="flex justify-end">
@@ -144,7 +147,7 @@ export default function EditProfilePage() {
             icon={<SaveOutlined />}
             loading={isSubmitting}
           >
-            Save
+            {t?.Save}
           </Button>
         </Form.Item>
       </Form>

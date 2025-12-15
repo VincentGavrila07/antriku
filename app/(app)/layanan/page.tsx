@@ -1,6 +1,6 @@
 "use client";
 
-import { useLanguage } from "@/app/languange-context";
+import { Translations, useLanguage } from "@/app/languange-context";
 import { Spin, Input, notification, Button } from "antd";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -10,7 +10,7 @@ import { useDebounce } from "@/app/utils/useDebounce";
 import Breadcrumbs from "@/app/components/breadcrumbs";
 import { usePermission } from "@/app/context/permission-context";
 import { PlusOutlined } from "@ant-design/icons";
-import Swal from "sweetalert2";  
+import Swal from "sweetalert2";
 import { Service, ServiceResponsePagination } from "@/types/Service";
 import ServiceService from "@/services/ServiceService";
 import TableService from "@/app/Tables/table-service";
@@ -18,6 +18,7 @@ import TableService from "@/app/Tables/table-service";
 export default function SeriveManagementPage() {
   const router = useRouter();
   const { translations, loading: langLoading } = useLanguage();
+  const t: Translations["service"] | undefined = translations?.service;
   const { permissions, loading: permissionLoading } = usePermission();
 
   const [page, setPage] = useState(1);
@@ -25,8 +26,12 @@ export default function SeriveManagementPage() {
   const [searchText, setSearchText] = useState("");
   const debouncedSearch = useDebounce(searchText, 1500);
 
-
-  const { data: services, isLoading:loadingServices, error:errorServices, refetch } = useQuery<ServiceResponsePagination<Service[]>, Error>({
+  const {
+    data: services,
+    isLoading: loadingServices,
+    error: errorServices,
+    refetch,
+  } = useQuery<ServiceResponsePagination<Service[]>, Error>({
     queryKey: ["services", page, pageSize, debouncedSearch],
     queryFn: () =>
       ServiceService.getAllService({
@@ -38,7 +43,10 @@ export default function SeriveManagementPage() {
   });
 
   useEffect(() => {
-    if (!permissionLoading && !permissions.includes("view-Service-management")) {
+    if (
+      !permissionLoading &&
+      !permissions.includes("view-Service-management")
+    ) {
       router.replace("/forbidden");
     }
   }, [permissions, permissionLoading, router]);
@@ -53,38 +61,39 @@ export default function SeriveManagementPage() {
 
   if (errorServices) {
     notification.error({
-      title: "Gagal Memuat Data Service",
-      description: "Terjadi kesalahan dalam memuat data service",
+      title: t?.ErrorLoadServiceTitle,
+      description: t?.ErrorLoadServiceDesc,
     });
   }
 
-  const t = translations.Sidebar;
-
   const handleDeleteUser = async (userId: string) => {
-    console.log("Attempting to delete Service:", userId); 
+    console.log("Attempting to delete Service:", userId);
     try {
-      await ServiceService.deleteService(userId, localStorage.getItem("token") || "");
+      await ServiceService.deleteService(
+        userId,
+        localStorage.getItem("token") || ""
+      );
 
       refetch();
 
-      notification.success({ title: "Service berhasil dihapus" });
+      notification.success({ title: t?.SuccessDeleteService });
     } catch (error) {
-      console.error("Delete failed:", error);  
+      console.error("Delete failed:", error);
       notification.error({
-        title: "Gagal Menghapus Service",
-        description: "Terjadi kesalahan saat menghapus Service",
+        title: t?.ErrorDeleteServiceTitle,
+        description: t?.ErrorDeleteServiceDesc,
       });
     }
   };
 
   const handleDeleteConfirmation = (userId: string) => {
     Swal.fire({
-      title: "Konfirmasi Hapus Service",
-      text: "Apakah Anda yakin ingin menghapus Service ini?",
+      title: t?.DeleteServiceConfirmTitle,
+      text: t?.DeleteServiceConfirmText,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Hapus",
-      cancelButtonText: "Batal",
+      confirmButtonText: t?.DeleteServiceConfirmOk,
+      cancelButtonText: t?.DeleteServiceConfirmCancel,
     }).then((result) => {
       if (result.isConfirmed) {
         handleDeleteUser(userId);
@@ -95,17 +104,17 @@ export default function SeriveManagementPage() {
   return (
     <div>
       <Breadcrumbs
-        items={[{ label: "User", href: "/admin/user-management/user" }]}
+        items={[{ label: t?.Services ?? "", href: "/admin/layanan" }]}
       />
 
-      <h2 className="text-3xl font-semibold mb-4 mt-5">List Service</h2>
+      <h2 className="text-3xl font-semibold mb-4 mt-5">{t?.ListService}</h2>
 
       <div className="flex justify-end items-center mt-4 mb-6 gap-5">
         <Input
-          placeholder="Search by name..."
+          placeholder={t?.SearchByNameService}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          className="w-80 max-w-xs mr-4" 
+          className="w-80 max-w-xs mr-4"
         />
         <Button
           type="primary"
@@ -114,7 +123,7 @@ export default function SeriveManagementPage() {
             router.push("/layanan/add");
           }}
         >
-          Add Layanan
+          {t?.AddServiceButton}
         </Button>
       </div>
 
@@ -128,7 +137,7 @@ export default function SeriveManagementPage() {
           setPage(newPage);
           if (newPageSize) setPageSize(newPageSize);
         }}
-        onDelete={handleDeleteConfirmation} 
+        onDelete={handleDeleteConfirmation}
       />
     </div>
   );
