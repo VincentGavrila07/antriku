@@ -72,7 +72,7 @@ export default function UserDetailPage() {
   return (
     <div className="p-4">
       <Breadcrumbs
-        items={[{ label: t.ListUser, href: "/admin/user-management/user" }]}
+        items={[{ label: t.ListUser, href: "/user-management/user" }]}
       />
 
       <h2 className="text-2xl font-semibold mb-4">{t.UserDetail}</h2>
