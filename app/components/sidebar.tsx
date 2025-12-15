@@ -122,6 +122,11 @@ export default function Sidebar({ roleId }: SidebarProps) {
       icon: <ShoppingCartOutlined />,
       label: <Link href="/riwayat">History</Link>,
     },
+    roleId === 1 && {
+      key: "display",
+      icon: <ShoppingCartOutlined />,
+      label: <Link href="/DisplayService">Display</Link>,
+    },
   ].filter(Boolean) as MenuProps["items"];
 
   return (

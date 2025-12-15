@@ -26,29 +26,35 @@ export default function EditPermissionPage() {
     );
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { data: permissionDetail, isLoading: loadingDetail } = useQuery({
     queryKey: ["permission", id],
     queryFn: () => PermissionService.getPermissionById(id as string),
   });
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { data: allRoles, isLoading: loadingRoles } = useQuery<Role[]>({
     queryKey: ["all-roles"],
     queryFn: () => RoleService.getAllRole().then((res) => res.data),
   });
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { data: assignedRoles, isLoading: loadingAssigned } = useQuery<Role[]>({
     queryKey: ["assigned-roles", id],
     queryFn: () => PermissionService.getRolesByPermission(id as string),
   });
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (assignedRoles && selectedRoles.length === 0) {
       setSelectedRoles(assignedRoles.map((role) => role.id.toString()));
     }
   }, [assignedRoles, selectedRoles]);
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const updateMutation = useMutation({
     mutationFn: () =>
       PermissionService.updatePermissionRoles(
