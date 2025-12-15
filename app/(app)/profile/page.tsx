@@ -79,7 +79,7 @@ export default function EditProfilePage() {
   if (langLoading || userLoading || !translations || !loggedInUser) {
     return (
       <div className="flex justify-center items-center h-40">
-        <Spin />
+        <Spin size="large" />
       </div>
     );
   }

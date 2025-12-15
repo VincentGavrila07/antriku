@@ -45,7 +45,7 @@ export default function UserDetailPage() {
   if (langLoading || permissionLoading || !t) {
     return (
       <div className="flex justify-center items-center h-40">
-        <Spin />
+        <Spin size="large" />
       </div>
     );
   }
@@ -53,7 +53,7 @@ export default function UserDetailPage() {
   if (isLoading || !userData) {
     return (
       <div className="flex justify-center items-center h-40">
-        <Spin />
+        <Spin size="large" />
       </div>
     );
   }

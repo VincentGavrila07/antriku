@@ -52,6 +52,14 @@ export default function AddRolePage() {
       setIsSubmitting(false);
     }
   };
+  
+  if (langLoading || permissionLoading || !t) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div>

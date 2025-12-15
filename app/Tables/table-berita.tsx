@@ -1,88 +1,106 @@
 "use client";
 
 import { Table, Spin, Button, Image } from "antd";
-import type { ColumnsType } from "antd/es/table";
-import { DeleteOutlined } from "@ant-design/icons";
+import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import { Berita } from "@/types/Berita";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
+import { useLanguage } from "@/app/languange-context";
 import { TableBeritaProps } from "../props/table-berita-props";
 
 export default function TableBerita({
   data,
+  total,
+  page,
+  pageSize,
   isLoading = false,
+  onChange,
   onDelete,
 }: TableBeritaProps) {
+  const router = useRouter();
+  const { translations } = useLanguage();
+  const t = translations?.berita;
+
   const columns: ColumnsType<Berita> = [
     {
       title: "No",
-      key: "no",
       width: 70,
       align: "center",
-      render: (_, __, index) => (
-        <span className="font-medium text-gray-700">{index + 1}</span>
-      ),
+      render: (_, __, index) =>
+        (page - 1) * pageSize + index + 1,
     },
     {
-      title: "Judul",
-      dataIndex: "title",
-      key: "title",
+      title: t?.Title || "Title",
+      dataIndex: "judul",
+      key: "judul",
       render: (text) => (
         <span className="font-medium text-gray-800">{text}</span>
       ),
     },
     {
-      title: "Deskripsi",
-      dataIndex: "description",
-      key: "description",
-      ellipsis: true,
-      render: (text) => (
-        <span className="text-gray-600">{text}</span>
-      ),
-    },
-    {
       title: "Foto",
-      dataIndex: "image",
-      key: "image",
-      width: 120,
-      align: "center",
-      render: (image) =>
-        image ? (
+      dataIndex: "foto",
+      key: "foto",
+      render: (foto: string | null) =>
+        foto ? (
           <Image
-            src={image}
-            alt="berita"
-            width={60}
-            height={60}
-            style={{ objectFit: "cover", borderRadius: 8 }}
+            src={foto}
+            width={80}
+            height={80}
+            style={{ objectFit: "cover" }}
           />
         ) : (
-          <span className="text-gray-400">-</span>
+          <span>-</span>
         ),
-    },
+      },
+      {
+        title: t?.Description || "Description",
+        dataIndex: "deskripsi",
+        key: "deskripsi",
+        render: (text) => (
+          <span className="font-medium text-gray-800">{text}</span>
+        ),
+      },
     {
-      title: "Published At",
+      title: t?.PublishedAt || "Published At",
       dataIndex: "published_at",
       key: "published_at",
-      align: "center",
-      render: (date) => (
-        <span className="text-gray-700">
-          {date ? new Date(date).toLocaleDateString() : "-"}
-        </span>
-      ),
+      render: (date) =>
+        date ? new Date(date).toLocaleDateString() : "-",
     },
     {
       title: "Action",
       key: "action",
-      width: 100,
+      width: 130,
       align: "center",
       render: (_, record) => (
-        <Button
-          danger
-          onClick={() => onDelete?.(record.id.toString())}
-        >
-          <DeleteOutlined />
-        </Button>
+        <div className="flex justify-center gap-2">
+          <Button
+            size="small"
+            onClick={() => router.push(`/berita/edit/${record.id}`)}
+          >
+            <EditOutlined />
+          </Button>
+
+          <Button
+            size="small"
+            onClick={() => onDelete?.(record.id.toString())}
+          >
+            <DeleteOutlined />
+          </Button>
+        </div>
       ),
     },
   ];
+
+  const handleTableChange = (pagination: TablePaginationConfig) => {
+    if (onChange) {
+      onChange(
+        pagination.current || 1,
+        pagination.pageSize || pageSize
+      );
+    }
+  };
 
   return (
     <Spin spinning={isLoading}>
@@ -91,12 +109,19 @@ export default function TableBerita({
           columns={columns}
           dataSource={data}
           rowKey="id"
-          pagination={false}
-          bordered={false}
+          pagination={{
+            current: page,
+            pageSize: pageSize,
+            total: total,
+            showSizeChanger: true,
+            pageSizeOptions: ["10", "20", "30", "50"],
+            showTotal: (total) => `Total ${total} berita`,
+          }}
+          onChange={handleTableChange}
+          locale={{ emptyText: t?.NoData || "No Data" }}
           rowClassName={() =>
             "hover:bg-gray-50 transition-colors duration-200"
           }
-          locale={{ emptyText: "Belum ada berita" }}
         />
       </div>
     </Spin>

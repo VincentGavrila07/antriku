@@ -1,7 +1,7 @@
   "use client";
 
   import React, { useState } from "react";
-  import { Modal, Select, DatePicker, Form, notification } from "antd";
+  import { Modal, Select, DatePicker, Form, notification, Spin } from "antd";
   import Breadcrumbs from "@/app/components/breadcrumbs";
   import moment from "moment";
   import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -119,9 +119,14 @@
       form.resetFields();
     };
 
-    /* ===============================
-     * RENDER
-     * =============================== */
+    if (langLoading || isLoading || !services?.data || services.data.length === 0) {
+      return (
+        <div className="flex justify-center items-center h-40">
+          <Spin size="large" />
+        </div>
+      );
+    }
+
     return (
       <div className="p-6">
         <Breadcrumbs items={[{ label: t?.OrderService ?? "", href: "/order" }]} />

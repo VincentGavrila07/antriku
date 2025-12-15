@@ -86,6 +86,14 @@ export default function RoleManagementPage() {
       }
     });
   };
+  
+  if (langLoading || permissionLoading || !t || isLoading || !roles?.data) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div>

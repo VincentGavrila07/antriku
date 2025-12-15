@@ -92,6 +92,14 @@ export default function UserManagementPage() {
       }
     });
   };
+  
+  if (langLoading || permissionLoading || !t || isLoading || !users?.data) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div>

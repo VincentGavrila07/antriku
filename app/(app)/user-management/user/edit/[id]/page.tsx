@@ -107,7 +107,7 @@ export default function EditUserPage() {
   ) {
     return (
       <div className="flex justify-center items-center h-40">
-        <Spin />
+        <Spin size="large" />
       </div>
     );
   }

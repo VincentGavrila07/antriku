@@ -73,7 +73,7 @@ export default function AddUserPage() {
   if (langLoading || permissionLoading || !t || roles.length === 0) {
     return (
       <div className="flex justify-center items-center h-40">
-        <Spin />
+        <Spin size="large" />
       </div>
     );
   }

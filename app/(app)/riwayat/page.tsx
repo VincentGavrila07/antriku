@@ -67,8 +67,8 @@ export default function ServiceHistoryPage() {
   if (langLoading || permissionLoading || !translations) {
     return (
       <div className="flex justify-center items-center h-40">
-        <Spin />
-      </div>
+            <Spin size="large" />
+          </div>
     );
   }
 

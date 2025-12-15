@@ -295,6 +295,52 @@ export interface Translations {
     OpenManually: string;
     HelperText: string;
   };
+  berita: {
+    BeritaName: string;
+
+      // General
+      ListBerita: string;
+      AddBerita: string;
+      EditBerita: string;
+      Berita: string;
+
+      // Field
+      Title: string;
+      Description: string;
+      Image: string;
+      PublishedAt: string;
+
+      // Placeholder
+      TitlePlaceholder: string;
+      DescriptionPlaceholder: string;
+      ImagePlaceholder : string;
+      // Validation
+      TitleRequired: string;
+      DescriptionRequired: string;
+      ImageRequired:string;
+
+      // Success
+      SuccessAddBerita: string;
+      SuccessEditBerita: string;
+      SuccessDeleteBerita: string;
+
+      // Error
+      ErrorAddBerita: string;
+      ErrorEditBerita: string;
+      ErrorDeleteBerita: string;
+      ErrorLoadBerita: string;
+      ErrorLoadBeritaDesc: string;
+
+      // Delete confirmation
+      DeleteBeritaConfirmTitle: string;
+      DeleteBeritaConfirmText: string;
+      DeleteBeritaConfirmOk: string;
+      DeleteBeritaConfirmCancel: string;
+
+      // Table
+      NoData: string;
+      save:string;
+  };
 }
 
 interface LanguageContextType {

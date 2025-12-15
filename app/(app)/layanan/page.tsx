@@ -108,8 +108,17 @@ export default function ServiceManagementPage() {
       }
     });
   };
-
+  
+  if (langLoading || permissionLoading || !translations || loadingServices || !services?.data) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <Spin size="large" />
+      </div>
+    );
+  }
   return (
+
+    
     <div>
       <Breadcrumbs
         items={[{ label: t?.Services ?? "", href: "/layanan" }]}

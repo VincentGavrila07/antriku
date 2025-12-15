@@ -29,7 +29,7 @@ export default function EditServicePage() {
   const { translations, loading: langLoading } = useLanguage();
   const t: Translations["service"] | undefined = translations?.service;
   const [form] = Form.useForm();
-  const [users, setUsers] = useState<{ id: number; name: string }[]>([]);
+  const [users, setUsers] = useState<{ id: number; name: string; roleId: number }[]>([]);
   const [service, setService] = useState<Service | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -160,20 +160,20 @@ export default function EditServicePage() {
             filterOption={(input, option) =>
               (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
             }
-            options={users.map((user) => ({
-              value: user.id,
-              label: user.name,
-            }))}
+            options={users
+              .filter((user) => user.roleId === 3) // ✅ HANYA ROLE ID 3
+              .map((user) => ({
+                value: user.id,
+                label: user.name,
+              }))}
           />
-        </Form.Item>
+      </Form.Item>
+
 
         <Form.Item label={t?.EstimatedTime} name="estimated_time">
           <TimePicker format="HH:mm:ss" />
         </Form.Item>
 
-        <Form.Item label={t?.IsActive} name="is_active" valuePropName="checked">
-          <Switch />
-        </Form.Item>
 
         <Form.Item className="flex justify-end">
           <Button

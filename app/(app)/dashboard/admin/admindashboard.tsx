@@ -35,7 +35,8 @@ import ServiceService from "@/services/ServiceService";
 
 const { Title, Text } = Typography;
 
-/* ================= JAM REALTIME ================= */
+
+
 const RealtimeClock = memo(() => {
   const [time, setTime] = useState("");
 
@@ -70,65 +71,65 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
   const { translations, loading: langLoading } = useLanguage();
   const t: Translations["dashboard"] | undefined = translations?.dashboard;
   const [searchText, setSearchText] = useState("");
+  const [pageLoading, setPageLoading] = useState(true);
 
-  /* ================= FETCH DATA ================= */
   useEffect(() => {
-    const fetchDashboard = async () => {
+  const fetchDashboard = async () => {
+    try {
+      setPageLoading(true);
+      setLoadingStats(true);
+      setTableLoading(true);
+
+      /* USER STATS */
+      const patientRes = await UserService.getTotalUserByRole(2);
+      const staffRes = await UserService.getTotalUserByRole(3);
+
+      /* STAFF LIST (roleId = 3) */
+      const staffListRes = await UserService.getAllUsers({
+        page: 1,
+        pageSize: 100,
+        filters: { roleId: 3 },
+      });
+
+      const staffNameMap: Record<number, string> = {};
+      staffListRes.data.forEach((u: User) => {
+        staffNameMap[u.id] = u.name;
+      });
+      setStaffMap(staffNameMap);
+
+      /* SERVICE */
+      const serviceRes = await ServiceService.getAllService({
+        page: 1,
+        pageSize: 100,
+      });
+
+      /* QUEUE TODAY */
+      const today = new Date().toISOString().split("T")[0];
+      let totalServeToday = 0;
+
       try {
-        setLoadingStats(true);
-        setTableLoading(true);
-
-        /* ===== USER STATS ===== */
-        const patientRes = await UserService.getTotalUserByRole(2);
-        const staffRes = await UserService.getTotalUserByRole(3);
-
-        /* ===== AMBIL STAFF SAJA (roleId = 3) ===== */
-        const staffListRes = await UserService.getAllUsers({
-          page: 1,
-          pageSize: 100,
-          filters: {
-            roleId: 3, // 🔥 PENTING
-          },
+        const serveRes = await ServiceService.getTotalServe({
+          queue_date: today,
         });
+        totalServeToday = serveRes.total_completed_services;
+      } catch {}
 
-        const staffNameMap: Record<number, string> = {};
-        staffListRes.data.forEach((u: User) => {
-          staffNameMap[u.id] = u.name;
-        });
-        setStaffMap(staffNameMap);
+      setTotalPatients(patientRes.total);
+      setTotalStaff(staffRes.total);
+      setActiveServices(serviceRes.total);
+      setTodayQueues(totalServeToday);
+      setServices(serviceRes.data);
+    } catch (err) {
+      console.error(t?.ErrorLoadDashboard || "Gagal memuat dashboard", err);
+    } finally {
+      setLoadingStats(false);
+      setTableLoading(false);
+      setPageLoading(false); // ✅ PALING PENTING
+    }
+  };
 
-        /* ===== AMBIL SERVICE ===== */
-        const serviceRes = await ServiceService.getAllService({
-          page: 1,
-          pageSize: 100,
-        });
-
-        /* ===== QUEUE HARI INI ===== */
-        const today = new Date().toISOString().split("T")[0];
-        let totalServeToday = 0;
-
-        try {
-          const serveRes = await ServiceService.getTotalServe({
-            queue_date: today,
-          });
-          totalServeToday = serveRes.total_completed_services;
-        } catch {}
-
-        setTotalPatients(patientRes.total);
-        setTotalStaff(staffRes.total);
-        setActiveServices(serviceRes.total);
-        setTodayQueues(totalServeToday);
-        setServices(serviceRes.data);
-      } catch (err) {
-        console.error(t?.ErrorLoadDashboard || "Gagal memuat dashboard", err);
-      } finally {
-        setLoadingStats(false);
-        setTableLoading(false);
-      }
-    };
-
-    fetchDashboard();
-  }, []);
+  fetchDashboard();
+}, []);
 
   /* ================= STATS ================= */
   const [totalPatients, setTotalPatients] = useState(0);
@@ -144,66 +145,8 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
   /* ================= STAFF MAP (roleId = 3) ================= */
   const [staffMap, setStaffMap] = useState<Record<number, string>>({});
 
-  /* ================= FETCH DATA ================= */
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        setLoadingStats(true);
-        setTableLoading(true);
 
-        /* ===== USER STATS ===== */
-        const patientRes = await UserService.getTotalUserByRole(2);
-        const staffRes = await UserService.getTotalUserByRole(3);
-
-        /* ===== AMBIL STAFF SAJA (roleId = 3) ===== */
-        const staffListRes = await UserService.getAllUsers({
-          page: 1,
-          pageSize: 100,
-          filters: {
-            roleId: 3, // 🔥 PENTING
-          },
-        });
-
-        const staffNameMap: Record<number, string> = {};
-        staffListRes.data.forEach((u: User) => {
-          staffNameMap[u.id] = u.name;
-        });
-        setStaffMap(staffNameMap);
-
-        /* ===== AMBIL SERVICE ===== */
-        const serviceRes = await ServiceService.getAllService({
-          page: 1,
-          pageSize: 100,
-        });
-
-        /* ===== QUEUE HARI INI ===== */
-        const today = new Date().toISOString().split("T")[0];
-        let totalServeToday = 0;
-
-        try {
-          const serveRes = await ServiceService.getTotalServe({
-            queue_date: today,
-          });
-          totalServeToday = serveRes.total_completed_services;
-        } catch {}
-
-        setTotalPatients(patientRes.total);
-        setTotalStaff(staffRes.total);
-        setActiveServices(serviceRes.total);
-        setTodayQueues(totalServeToday);
-        setServices(serviceRes.data);
-      } catch (err) {
-        console.error(t?.ErrorLoadDashboard || "Gagal memuat dashboard", err);
-      } finally {
-        setLoadingStats(false);
-        setTableLoading(false);
-      }
-    };
-
-    fetchDashboard();
-  }, []);
-
-  if (langLoading || !translations) {
+  if (langLoading || pageLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Spin size="large" />

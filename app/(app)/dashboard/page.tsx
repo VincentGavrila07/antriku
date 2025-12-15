@@ -6,6 +6,7 @@ import UserService from "@/services/UserService";
 import AdminDashboard from "./admin/admindashboard";
 import StaffDashboard from "./staff/staffdashboard";
 import CustomerDashboard from "./customer/customerdashboard";
+import { Spin } from "antd";
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -20,7 +21,10 @@ export default function DashboardPage() {
     }
   }, []);
 
-  if (!user) return <div>Loading...</div>;
+  if (!user) return 
+      <div className="flex justify-center items-center h-screen">
+        <Spin size="large" />
+      </div>;
 
   // Render dashboard sesuai role
   if (user.roleId === 1) return <AdminDashboard user={user} />;

@@ -128,10 +128,12 @@ export default function AddServicePage() {
             filterOption={(input, option) =>
               (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
             }
-            options={users.map((user) => ({
-              value: user.id,
-              label: user.name,
-            }))}
+            options={users
+              .filter((user) => user.roleId === 3) // ✅ FILTER DI SINI
+              .map((user) => ({
+                value: user.id,
+                label: user.name,
+              }))}
           />
         </Form.Item>
 
@@ -139,9 +141,6 @@ export default function AddServicePage() {
           <TimePicker format="HH:mm:ss" />
         </Form.Item>
 
-        <Form.Item label={t?.IsActive} name="is_active" valuePropName="checked">
-          <Switch />
-        </Form.Item>
 
         <Form.Item className="flex justify-end">
           <Button

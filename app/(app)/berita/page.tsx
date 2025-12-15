@@ -14,6 +14,7 @@ import Swal from "sweetalert2";
 import { Berita } from "@/types/Berita";
 import BeritaService from "@/services/BeritaService";
 import TableBerita from "@/app/Tables/table-berita";
+import { BeritaResponsePagination } from "@/types/Berita";
 
 export default function BeritaManagementPage() {
   const router = useRouter();
@@ -22,27 +23,34 @@ export default function BeritaManagementPage() {
 
   const { permissions, loading: permissionLoading } = usePermission();
 
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
   const {
     data: berita,
     isLoading,
     error: beritaError,
     refetch,
-  } = useQuery<{ data: Berita[] }, Error>({
-    queryKey: ["berita"],
-    queryFn: () => BeritaService.getAllBerita(),
-    enabled: permissions.includes("view-berita"),
+  } = useQuery<BeritaResponsePagination<Berita[]>, Error>({
+    queryKey: ["berita", page, pageSize],
+    queryFn: () =>
+      BeritaService.getAllBeritaPagination({
+        page,
+        pageSize,
+      }),
+    enabled: permissions.includes("view-berita-management"),
   });
 
   useEffect(() => {
-    if (!permissionLoading && !permissions.includes("view-berita")) {
+    if (!permissionLoading && !permissions.includes("view-berita-management")) {
       router.replace("/forbidden");
     }
   }, [permissions, permissionLoading, router]);
 
   if (langLoading || permissionLoading || !t) {
     return (
-      <div className="flex justify-center items-center h-40">
-        <Spin />
+      <div className="flex justify-center items-center h-screen">
+        <Spin size="large" />
       </div>
     );
   }
@@ -65,7 +73,7 @@ export default function BeritaManagementPage() {
     } catch (error) {
       notification.error({
         title: t.ErrorDeleteBerita,
-        description: t.ErrorDeleteBeritaDesc,
+        description: t.ErrorDeleteBerita,
       });
     }
   };
@@ -88,7 +96,7 @@ export default function BeritaManagementPage() {
   return (
     <div>
       <Breadcrumbs
-        items={[{ label: t.BeritaName, href: "/berita" }]}
+        items={[{ label: t.ListBerita, href: "/berita" }]}
       />
 
       <h2 className="text-3xl font-semibold mb-4 mt-5">
@@ -99,9 +107,7 @@ export default function BeritaManagementPage() {
         <Button
           type="primary"
           icon={<PlusOutlined />}
-          onClick={() => {
-            router.push("/berita/add");
-          }}
+          onClick={() => router.push("/berita/add")}
         >
           {t.AddBerita}
         </Button>
@@ -109,7 +115,14 @@ export default function BeritaManagementPage() {
 
       <TableBerita
         data={berita?.data ?? []}
+        total={berita?.total || 0}
+        page={berita?.current_page || page}
+        pageSize={berita?.per_page || pageSize}
         isLoading={isLoading}
+        onChange={(newPage, newPageSize) => {
+          setPage(newPage);
+          if (newPageSize) setPageSize(newPageSize);
+        }}
         onDelete={handleDeleteConfirmation}
       />
     </div>
