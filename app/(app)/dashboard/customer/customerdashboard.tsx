@@ -317,7 +317,7 @@ export default function CustomerDashboard(props: CustomerDashboardProps) {
                       />
                       <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-gray-900/80 to-transparent text-white">
                         <Tag className="bg-blue-600 border-none text-white px-2 py-0.5 mb-2 text-[10px] font-bold rounded">
-                          {item.published_at}
+                          <span>{item.published_at ? new Date(item.published_at).toISOString().split('T')[0] : '-'}</span>
                         </Tag>
                         <Title level={4} className="text-white m-0">
                           {item.judul}
