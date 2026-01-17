@@ -312,7 +312,7 @@ export default function CustomerDashboard(props: CustomerDashboardProps) {
                   <Spin size="large" />
                 </div>
               ) : berita?.data?.length ? (
-                <Carousel autoplay dotPosition="bottom">
+                <Carousel autoplay dotPlacement="bottom">
                   {berita.data.map((item) => (
                     <div key={item.id} className="relative h-[250px] lg:h-[360px] overflow-hidden">
                       <img
@@ -324,7 +324,7 @@ export default function CustomerDashboard(props: CustomerDashboardProps) {
                         <Tag className="bg-blue-600 border-none text-white px-2 py-0.5 mb-2 text-[10px] font-bold rounded">
                           <span>{item.published_at ? new Date(item.published_at).toISOString().split('T')[0] : '-'}</span>
                         </Tag>
-                        <Title level={4} className="text-white m-0">
+                        <Title level={4} className="!text-white m-0">
                           {item.judul}
                         </Title>
                         <p className="text-xs md:text-sm line-clamp-2">{item.deskripsi}</p>
