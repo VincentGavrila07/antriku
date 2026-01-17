@@ -83,7 +83,7 @@ export default function EditBeritaPage() {
     fetchDetail();
   }, [id, form, t]);
 
-  if (langLoading || permissionLoading || loadingData || !t) {
+  if (langLoading || permissionLoading || !t) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Spin size="large" />
@@ -137,66 +137,67 @@ export default function EditBeritaPage() {
       <h2 className="text-3xl font-semibold mb-4 mt-5">
         {t.EditBerita}
       </h2>
-
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        className="space-y-6"
-      >
-        {/* Judul */}
-        <Form.Item
-          label={t.Title}
-          name="judul"
-          rules={[{ required: true, message: t.TitleRequired }]}
-        >
-          <Input />
-        </Form.Item>
-
-        {/* Deskripsi */}
-        <Form.Item
-          label={t.Description}
-          name="deskripsi"
-          rules={[{ required: true, message: t.DescriptionRequired }]}
-        >
-          <Input.TextArea rows={5} />
-        </Form.Item>
-
-        {/* Foto */}
-        <Form.Item label={t.Image}>
-          <Upload
-            listType="picture"
-            fileList={fileList}
-            onChange={({ fileList }) =>
-              setFileList(fileList as UploadFile[])
-            }
-            beforeUpload={() => false}
-            maxCount={1}
-            accept="image/*"
+      <Spin spinning={loadingData}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+          className="space-y-6"
           >
-            <Button icon={<UploadOutlined />}>
-              Upload Foto
+          {/* Judul */}
+          <Form.Item
+            label={t.Title}
+            name="judul"
+            rules={[{ required: true, message: t.TitleRequired }]}
+          >
+            <Input />
+          </Form.Item>
+
+          {/* Deskripsi */}
+          <Form.Item
+            label={t.Description}
+            name="deskripsi"
+            rules={[{ required: true, message: t.DescriptionRequired }]}
+          >
+            <Input.TextArea rows={5} />
+          </Form.Item>
+
+          {/* Foto */}
+          <Form.Item label={t.Image}>
+            <Upload
+              listType="picture"
+              fileList={fileList}
+              onChange={({ fileList }) =>
+                setFileList(fileList as UploadFile[])
+              }
+              beforeUpload={() => false}
+              maxCount={1}
+              accept="image/*"
+            >
+              <Button icon={<UploadOutlined />}>
+                Upload Foto
+              </Button>
+            </Upload>
+          </Form.Item>
+
+          {/* Published At */}
+          <Form.Item label={t.PublishedAt} name="published_at">
+            <DatePicker showTime style={{ width: "100%" }} />
+          </Form.Item>
+
+          {/* Submit */}
+          <Form.Item className="flex justify-end">
+            <Button
+              type="primary"
+              htmlType="submit"
+              icon={<SaveOutlined />}
+              loading={isSubmitting}
+            >
+              {t.save}
             </Button>
-          </Upload>
-        </Form.Item>
-
-        {/* Published At */}
-        <Form.Item label={t.PublishedAt} name="published_at">
-          <DatePicker showTime style={{ width: "100%" }} />
-        </Form.Item>
-
-        {/* Submit */}
-        <Form.Item className="flex justify-end">
-          <Button
-            type="primary"
-            htmlType="submit"
-            icon={<SaveOutlined />}
-            loading={isSubmitting}
-          >
-            {t.save}
-          </Button>
-        </Form.Item>
-      </Form>
+          </Form.Item>
+        </Form>
+      </Spin>  
     </div>
   );
 }
