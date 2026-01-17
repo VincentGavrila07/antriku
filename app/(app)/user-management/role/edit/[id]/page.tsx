@@ -23,7 +23,7 @@ export default function EditRolePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!permissionLoading && !permissions.includes("view-user-management")) {
+    if (!permissionLoading && !permissions.includes("view-role-management")) {
       router.replace("/forbidden");
     }
   }, [permissions, permissionLoading, router]);
@@ -32,7 +32,7 @@ export default function EditRolePage() {
     queryKey: ["role", id],
     queryFn: () =>
       RoleService.getRoleById(id, localStorage.getItem("token") || ""),
-    enabled: !!id && permissions.includes("view-user-management"),
+    enabled: !!id && permissions.includes("view-role-management"),
   });
 
   useEffect(() => {

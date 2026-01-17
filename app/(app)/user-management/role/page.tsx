@@ -35,11 +35,11 @@ export default function RoleManagementPage() {
         page,
         pageSize,
       }),
-    enabled: permissions.includes("view-user-management"),
+    enabled: permissions.includes("view-role-management"),
   });
 
   useEffect(() => {
-    if (!permissionLoading && !permissions.includes("view-user-management")) {
+    if (!permissionLoading && !permissions.includes("view-role-management")) {
       router.replace("/forbidden");
     }
   }, [permissions, permissionLoading, router]);

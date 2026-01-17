@@ -300,7 +300,12 @@ export default function CustomerDashboard(props: CustomerDashboardProps) {
             </Text>
             <Card
               className={CARD_HEIGHT_CLASS}
-              bodyStyle={{ padding: 0, height: "100%" }}
+               styles={{
+                body: {
+                  padding: 0,
+                  height: "100%",
+                },
+              }}
             >
               {beritaLoading ? (
                 <div className="flex justify-center items-center h-full">

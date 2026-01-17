@@ -1,2 +1,6 @@
 @import "tailwindcss";
 @import 'antd/dist/reset.css';
+
+#__next_devtools {
+  display: none !important;
+}

@@ -21,7 +21,7 @@ export default function AddRolePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!permissionLoading && !permissions.includes("view-user-management")) {
+    if (!permissionLoading && !permissions.includes("view-role-management")) {
       router.replace("/forbidden");
     }
   }, [permissions, permissionLoading, router]);
@@ -66,7 +66,7 @@ export default function AddRolePage() {
       <Breadcrumbs
         items={[
           { label: t.RoleName, href: "/user-management/role" },
-          { label: t.AddRole, href: "i/user-management/role/add" },
+          { label: t.AddRole, href: "/user-management/role/add" },
         ]}
       />
 

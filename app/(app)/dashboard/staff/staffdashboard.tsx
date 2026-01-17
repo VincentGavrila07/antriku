@@ -349,52 +349,6 @@ export default function StaffDashboard({ user }: StaffDashboardProps) {
               </div>
             </div>
 
-            {/* Notes Section */}
-            <Card
-              title={
-                <div className="flex justify-between items-center">
-                  <Text strong className="text-xs">
-                    {t?.Notes || "NOTES"}
-                  </Text>
-                  <Text className="text-xs text-gray-500">2/5</Text>
-                </div>
-              }
-              size="small"
-              className="shadow-sm mb-6"
-              extra={<PlusOutlined className="cursor-pointer text-xs" />}
-              styles={{ body: { padding: "12px" } }}
-            >
-              <div className="space-y-3">
-                <div className="bg-white p-2.5 rounded border border-gray-200 flex items-start gap-2">
-                  <ClockCircleOutlined className="text-blue-500 mt-0.5 text-xs" />
-                  <div className="flex flex-col">
-                    <Text className="text-xs font-bold text-gray-600">
-                      {t?.BreakNote || "Break"}
-                    </Text>
-                    <Text className="text-xs text-gray-500">12:00 - 13:00</Text>
-                  </div>
-                </div>
-
-                <div className="bg-white p-2.5 rounded border border-gray-200 flex items-start gap-2">
-                  <ClockCircleOutlined className="text-blue-500 mt-0.5 text-xs" />
-                  <div className="flex flex-col">
-                    <Text className="text-xs font-bold text-gray-600">
-                      {t?.MonthlyMeeting || "Monthly Meeting"}
-                    </Text>
-                    <Text className="text-xs text-gray-500">Jumat, 16:00</Text>
-                  </div>
-                </div>
-
-                <div className="mt-2">
-                  <input
-                    type="text"
-                    placeholder={t?.NewNotePlaceholder || "New note..."}
-                    className="w-full p-2 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-            </Card>
-
             {/* History Queue List */}
             {activeService && (
               <div className="mt-6">
